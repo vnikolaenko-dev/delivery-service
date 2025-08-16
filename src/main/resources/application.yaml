@@ -1,0 +1,38 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/postgres
+    username: postgres
+    password: den1980FG
+
+security:
+  jwt:
+    secret: YWRhd2Rhd2Rqbml1aHdlZHlnZm5tbHR1bzQ4MTJhZGF3ZGFhd2Rhd2RuYXdpdWRoYmF3aXVkYmF5aXVk
+    access: 300000
+    refresh: 2592000000
+    issuer: "don-polesie-admin"
+  guest:
+    secret: ADMIWNDAJWIHDBAIUHUWDAUDJajndwjdadadiadubrjnirun348579jBHBD88hfj374fjJAlnbxFAWND
+    ttl: 2592000000
+    issuer: "don-polesie-api"
+  YooKassa:
+    shopId: 1135993
+    secretKey: test_bZX-_VfdaX0Rr3EPRdubMCzq5hJVdNpZ6e4ZvaVaAgM
+
+
+import:
+  directory: /Users/deniapogosov/Desktop/products
+
+logging:
+  level:
+    org.springframework: INFO
+    com.example.demo: DEBUG
+
+jpa:
+  properties:
+    dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      show_sql: true
+
+server:
+  port: 8080

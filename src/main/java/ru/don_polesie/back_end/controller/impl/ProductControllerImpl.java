@@ -1,0 +1,77 @@
+package ru.don_polesie.back_end.controller.impl;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
+import ru.don_polesie.back_end.controller.ProductController;
+import ru.don_polesie.back_end.dto.product.ProductDtoRR;
+import ru.don_polesie.back_end.dto.product.ProductDtoSearch;
+import ru.don_polesie.back_end.service.ProductService;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+public class ProductControllerImpl implements ProductController {
+
+    private final ProductService productServiceImpl;
+
+    @Override
+    public ResponseEntity<Page<ProductDtoRR>> findProductsPage(Integer pageNumber) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(productServiceImpl.findProductsPage(pageNumber));
+    }
+
+    @Override
+    public ResponseEntity<ProductDtoRR> update(ProductDtoRR productDtoRR, Long id) {
+        return productServiceImpl.update(productDtoRR, id);
+    }
+
+    @Override
+    public ResponseEntity<ProductDtoRR> save(ProductDtoRR productDtoRR) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(productServiceImpl.save(productDtoRR));
+    }
+
+    @Override
+    public ResponseEntity<Void> delete(Long id) {
+        productServiceImpl.deleteById(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Override
+    public ResponseEntity<ProductDtoRR> findById(Long id) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(productServiceImpl.findById(id));
+    }
+
+    @Override
+    public ResponseEntity<List<ProductDtoRR>> findAllByParams(Long id,
+                                                              String brand,
+                                                              String name) {
+        ProductDtoSearch productDtoSearch = ProductDtoSearch
+                .builder()
+                .id(id)
+                .brand(brand)
+                .name(name)
+                .build();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(productServiceImpl.findAllByParams(productDtoSearch));
+    }
+
+    @Override
+    public ResponseEntity<Page<ProductDtoRR>> findProductsByQuery(String query,
+                                                                  Integer pageNumber) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(productServiceImpl.findProductByQuery(query, pageNumber));
+    }
+
+}
