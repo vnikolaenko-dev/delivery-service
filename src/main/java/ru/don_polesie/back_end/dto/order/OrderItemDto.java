@@ -9,9 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OrderItemDto {
     private Long productId;
-    private String name;
-    private String brand;
-    private String imageUrl;
-    private String quantity;
-    private Boolean isWeighted;
+    private Integer quantity;
 }

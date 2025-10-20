@@ -9,7 +9,7 @@ public interface YooKassaService {
 
     void storeNotification(JsonNode notification);
 
-    JsonNode getPayment(String paymentId) throws Exception;
+    JsonNode getPayment(Long id) throws Exception;
 
     boolean verifyNotification(String remoteIp, JsonNode notification);
 }

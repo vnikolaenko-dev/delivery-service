@@ -19,6 +19,7 @@ import ru.don_polesie.back_end.repository.ProductRepository;
 import ru.don_polesie.back_end.service.ProductService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -49,15 +50,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDtoRR> findAllByParams(ProductDtoSearch productDtoSearch) {
+    public Page<ProductDtoRR> findAllByParams(ProductDtoSearch productDtoSearch,
+                                              Integer pageNumber) {
+        // по 20 элементов на страницу
+        Pageable pageable = PageRequest.of(pageNumber, 20);
+
         return productRepository
                 .findProductsByParams(
                         productDtoSearch.getId(),
                         productDtoSearch.getBrand(),
-                        productDtoSearch.getName())
-                .stream()
-                .map(productMapper::toProductDtoRR)
-                .toList();
+                        productDtoSearch.getName(),
+                        pageable
+                )
+                .map(productMapper::toProductDtoRR);
     }
 
     @Override
@@ -108,7 +113,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ProductDtoRR save(ProductDtoRR productDtoRR) {
-        productDtoRR.setIsWeighted(productDtoRR.getVolume().contains("~"));
         var productNew = productMapper.productDtoRRtoProduct(productDtoRR);
         return productMapper.toProductDtoRR(productRepository.save(productNew));
     }

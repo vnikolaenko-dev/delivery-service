@@ -9,10 +9,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.don_polesie.back_end.dto.auth.JwtAuthRequest;
 import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
+import ru.don_polesie.back_end.dto.auth.RegisterRequest;
+import ru.don_polesie.back_end.model.Role;
 import ru.don_polesie.back_end.model.User;
+import ru.don_polesie.back_end.repository.RoleRepository;
 import ru.don_polesie.back_end.repository.UserRepository;
 import ru.don_polesie.back_end.security.admin.JwtTokenProvider;
 import ru.don_polesie.back_end.service.AuthService;
+
+import java.util.HashSet;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +29,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
 
     @Override
@@ -56,12 +62,16 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public void save(JwtAuthRequest request) {
+    public void save(RegisterRequest request) {
         var user = new User();
 
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-
+        HashSet<Role> roles = new HashSet<>();
+        roles.add(roleRepository.findByName("ROLE_USER").get());
+        user.setRoles(roles);
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setEmail(request.getEmail());
         userRepository.save(user);
     }
 }

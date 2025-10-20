@@ -2,12 +2,13 @@ package ru.don_polesie.back_end.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Table(name = "products")
+@NoArgsConstructor
 public class Product {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,8 +35,5 @@ public class Product {
 
     public Product(Long id) {
         this.id = id;
-    }
-
-    public Product() {
     }
 }

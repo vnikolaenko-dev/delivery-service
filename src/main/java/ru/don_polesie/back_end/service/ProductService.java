@@ -15,7 +15,7 @@ public interface ProductService {
 
     ProductDtoRR findById(Long id);
 
-    List<ProductDtoRR> findAllByParams(ProductDtoSearch productDtoSearch);
+    Page<ProductDtoRR> findAllByParams(ProductDtoSearch productDtoSearch, Integer pageNumber);
 
     Page<ProductDtoRR> findProductByQuery(String query, Integer pageNumber);
 

@@ -28,11 +28,14 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
             "AND  (:name IS NULL OR (LOWER(p.name) LIKE CONCAT('%', LOWER(CAST(:name AS string)), '%')))" +
             "ORDER BY p.id"
     )
-    List<Product> findProductsByParams(
+
+    Page<Product> findProductsByParams(
             @Param("id") Long id,
             @Param("brand") String brand,
-            @Param("name") String name
+            @Param("name") String name,
+            Pageable pageable
     );
+
 
     @Query("SELECT p FROM Product p WHERE " +
             "CAST(p.id AS string) LIKE CONCAT('%', :query, '%') OR " +

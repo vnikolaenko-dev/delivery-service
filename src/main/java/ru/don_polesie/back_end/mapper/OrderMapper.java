@@ -30,12 +30,8 @@ public interface OrderMapper {
         return ops.stream()
                 .map(op -> new OrderItemDto(
                         op.getProduct().getId(),
-                        op.getProduct().getName(),
-                        op.getProduct().getBrand(),
-                        op.getProduct().getImageUrl(),
-                        op.getQuantity(),
-                        op.getProduct().getIsWeighted())
-                        )
+                        op.getQuantity())
+                )
                 .collect(Collectors.toList());
     }
 }

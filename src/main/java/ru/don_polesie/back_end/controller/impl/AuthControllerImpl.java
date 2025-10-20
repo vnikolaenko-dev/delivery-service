@@ -9,6 +9,7 @@ import ru.don_polesie.back_end.controller.AuthController;
 import ru.don_polesie.back_end.dto.auth.JwtAuthRequest;
 import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
 import ru.don_polesie.back_end.dto.auth.JwtRefreshRequest;
+import ru.don_polesie.back_end.dto.auth.RegisterRequest;
 import ru.don_polesie.back_end.service.AuthService;
 
 @RestController
@@ -24,7 +25,7 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public ResponseEntity<Void> register(JwtAuthRequest request) {
+    public ResponseEntity<Void> register(RegisterRequest request) {
         authServiceImpl.save(request);
         return ResponseEntity
                 .status(HttpStatus.OK)

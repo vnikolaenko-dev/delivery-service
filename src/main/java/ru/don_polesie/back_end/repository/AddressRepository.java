@@ -1,0 +1,16 @@
+package ru.don_polesie.back_end.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import ru.don_polesie.back_end.model.Address;
+import ru.don_polesie.back_end.model.User;
+
+import java.util.List;
+
+public interface AddressRepository extends JpaRepository<Address, Integer> {
+
+    List<Address> findAllByUser(User user);
+
+    void deleteByIdAndUser(Long id, User user);
+
+    boolean existsByIdAndUser(Long id, User user);
+}

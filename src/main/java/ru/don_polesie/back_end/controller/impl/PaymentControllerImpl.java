@@ -23,6 +23,7 @@ public class PaymentControllerImpl implements PaymentController {
     private final YooKassaService yooKassaServiceImpl;
 
     @Override
+    @Deprecated
     public ResponseEntity<?> createPayment(@RequestBody CreatePaymentRequest req) {
         try {
             JsonNode payment = yooKassaServiceImpl.createPayment(req.getOrderId());
@@ -50,7 +51,7 @@ public class PaymentControllerImpl implements PaymentController {
     }
 
     @Override
-    public ResponseEntity<?> getPayment(String id) {
+    public ResponseEntity<?> getPayment(Long id) {
         try {
             JsonNode payment = yooKassaServiceImpl.getPayment(id);
             return ResponseEntity.ok(payment);

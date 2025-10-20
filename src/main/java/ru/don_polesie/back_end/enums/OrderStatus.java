@@ -5,12 +5,14 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum OrderStatus {
     NEW("New"),
-    PROCESSING("Processing"),
+    READY_FOR_DELIVERY("READY_FOR_DELIVERY"),
     NEEDS_TO_BE_UPDATED("Needs to be updated"),
-    PAID("Paid"),
-    SHIPPED("Shipped"),
     PAYING("On payment"),
-    CANCELLED("Cancelled");
+    PAID("Paid"),
+    MONEY_RESERVAITED("MONEY_RESERVAITED"),
+    SHIPPED("Shipped"),
+    ERROR_ON_PAYMENT("Error on payment"),
+    CANCELED("Canceled");
 
     private final String value;
 

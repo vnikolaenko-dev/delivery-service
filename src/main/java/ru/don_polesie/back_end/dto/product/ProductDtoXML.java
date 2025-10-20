@@ -45,7 +45,7 @@ public class ProductDtoXML {
     private String countryOfOrigin;
 
     @XmlElement(name = "Amount")
-    private String amount;
+    private Integer amount;
 
     private Boolean isWeighted;
 }

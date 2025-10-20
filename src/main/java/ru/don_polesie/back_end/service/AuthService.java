@@ -3,6 +3,7 @@ package ru.don_polesie.back_end.service;
 
 import ru.don_polesie.back_end.dto.auth.JwtAuthRequest;
 import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
+import ru.don_polesie.back_end.dto.auth.RegisterRequest;
 
 public interface AuthService {
 
@@ -10,6 +11,6 @@ public interface AuthService {
 
     JwtAuthResponse refresh(String refreshToken);
 
-    void save(JwtAuthRequest request);
+    void save(RegisterRequest request);
 
 }

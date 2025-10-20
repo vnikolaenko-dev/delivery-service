@@ -24,7 +24,7 @@ public class ProcessWeightsRequest {
 
         @NotNull(message = "weight обязателен")
         @PositiveOrZero(message = "Вес не может быть отрицательным")
-        private Double weight;
+        private Integer weight;
     }
 }
 

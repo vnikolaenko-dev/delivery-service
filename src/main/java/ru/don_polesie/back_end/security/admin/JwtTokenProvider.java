@@ -128,7 +128,7 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token).getPayload().get("id").toString();
     }
 
-    private String getUsername(String token) {
+    public String getUsername(String token) {
         return Jwts.parser().verifyWith((SecretKey) key).build()
                 .parseSignedClaims(token).getPayload().getSubject();
     }

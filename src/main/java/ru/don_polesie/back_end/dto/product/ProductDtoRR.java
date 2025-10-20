@@ -40,7 +40,7 @@ public class ProductDtoRR {
     private Integer energyKcalPer100g;
 
     @NotNull(message = "Вес/объём обязателен")
-    private String Volume;
+    private String volume;
 
     @NotNull(message = "Количество товара обязателно")
     @Min(value = 1, message = "Количество товара должно быть положительным")

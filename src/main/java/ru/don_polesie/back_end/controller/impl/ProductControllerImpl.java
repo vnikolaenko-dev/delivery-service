@@ -26,24 +26,6 @@ public class ProductControllerImpl implements ProductController {
     }
 
     @Override
-    public ResponseEntity<ProductDtoRR> update(ProductDtoRR productDtoRR, Long id) {
-        return productServiceImpl.update(productDtoRR, id);
-    }
-
-    @Override
-    public ResponseEntity<ProductDtoRR> save(ProductDtoRR productDtoRR) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(productServiceImpl.save(productDtoRR));
-    }
-
-    @Override
-    public ResponseEntity<Void> delete(Long id) {
-        productServiceImpl.deleteById(id);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    @Override
     public ResponseEntity<ProductDtoRR> findById(Long id) {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -51,9 +33,9 @@ public class ProductControllerImpl implements ProductController {
     }
 
     @Override
-    public ResponseEntity<List<ProductDtoRR>> findAllByParams(Long id,
+    public ResponseEntity<Page<ProductDtoRR>> findAllByParams(Long id,
                                                               String brand,
-                                                              String name) {
+                                                              String name,Integer pageNumber) {
         ProductDtoSearch productDtoSearch = ProductDtoSearch
                 .builder()
                 .id(id)
@@ -63,7 +45,7 @@ public class ProductControllerImpl implements ProductController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(productServiceImpl.findAllByParams(productDtoSearch));
+                .body(productServiceImpl.findAllByParams(productDtoSearch, pageNumber));
     }
 
     @Override

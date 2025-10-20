@@ -10,16 +10,21 @@ import ru.don_polesie.back_end.enums.OrderStatus;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.model.Order;
 import ru.don_polesie.back_end.model.OrderProduct;
+import ru.don_polesie.back_end.model.Product;
 import ru.don_polesie.back_end.repository.OrderRepository;
 import ru.don_polesie.back_end.service.YooKassaService;
 import ru.don_polesie.back_end.utils.CidrUtils;
 
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.*;
 
 
@@ -77,7 +82,7 @@ public class YooKassaServiceImpl implements YooKassaService {
         paymentMethodData.put("type", "bank_card");
         payload.set("payment_method_data", paymentMethodData);
 
-        payload.put("capture", true);
+        payload.put("capture", false);
 
         var confirmation = mapper.createObjectNode();
         confirmation.put("type", "redirect");
@@ -109,6 +114,8 @@ public class YooKassaServiceImpl implements YooKassaService {
             JsonNode json = mapper.readTree(response.body());
             String paymentId = json.get("id").asText();
             order.setStatus(OrderStatus.PAYING);
+            order.setPaymentId(paymentId);
+            orderRepository.save(order);
             return json;
         } else {
             throw new RuntimeException("YooKassa createPayment error: " + response.statusCode() + " " + response.body());
@@ -116,14 +123,26 @@ public class YooKassaServiceImpl implements YooKassaService {
     }
 
     @Override
-    public JsonNode getPayment(String paymentId) throws Exception {
-        String credentials = shopId + ":" + secretKey;
-        String basicAuth = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
+    public JsonNode getPayment(Long orderId) throws Exception {
+        // 1. Достаем заказ и его paymentId
+        Order order = orderRepository.findById(Long.valueOf(orderId))
+                .orElseThrow(() -> new ObjectNotFoundException("Order not found with id: " + orderId));
 
+        String paymentId = order.getPaymentId();
+        if (paymentId == null || paymentId.isBlank()) {
+            throw new RuntimeException("PaymentId not found for order " + orderId);
+        }
+
+        // 2. Авторизация
+        String credentials = shopId + ":" + secretKey;
+        String basicAuth = Base64.getEncoder()
+                .encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
+
+        // 3. GET /v3/payments/{paymentId}
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.yookassa.ru/v3/payments/" + paymentId))
                 .header("Authorization", "Basic " + basicAuth)
-                .header("Content-Type", "application/json")
+                .timeout(Duration.ofSeconds(30))
                 .GET()
                 .build();
 
@@ -131,9 +150,25 @@ public class YooKassaServiceImpl implements YooKassaService {
 
         if (response.statusCode() >= 200 && response.statusCode() < 300) {
             JsonNode json = mapper.readTree(response.body());
+
+            // При желании можно обновить статус заказа
+            String status = json.get("status").asText();
+            if ("succeeded".equals(status)) {
+                order.setStatus(OrderStatus.PAID);
+                orderRepository.save(order);
+            } else if ("waiting_for_capture".equals(status)){
+                order.setStatus(OrderStatus.MONEY_RESERVAITED);
+                orderRepository.save(order);
+            } else if ("canceled".equals(status)) {
+                order.setStatus(OrderStatus.CANCELED);
+                orderRepository.save(order);
+            }
+
             return json;
         } else {
-            throw new RuntimeException("YooKassa getPayment error: " + response.statusCode() + " " + response.body());
+            throw new RuntimeException(
+                    "YooKassa getPayment error: " + response.statusCode() + " " + response.body()
+            );
         }
     }
 
@@ -147,13 +182,11 @@ public class YooKassaServiceImpl implements YooKassaService {
 
         if (notification.get("event").asText().equals("payment.succeeded")) {
             order.setStatus(OrderStatus.PAID);
-
             for (OrderProduct orderProduct : order.getOrderProducts()) {
-                var currentAmount = orderProduct.getProduct().getAmount();
-                var subtractedAmount = (int) Double.parseDouble(orderProduct.getQuantity().split(" ")[0]);
+                Integer currentAmount = orderProduct.getProduct().getAmount();
+                Integer subtractedAmount = orderProduct.getQuantity();
                 orderProduct.getProduct().setAmount(currentAmount - subtractedAmount);
             }
-
         }
     }
 
@@ -189,7 +222,7 @@ public class YooKassaServiceImpl implements YooKassaService {
             String notifiedStatus = object.get("status").asText();
 
             // 3. Fetch current from YooKassa
-            JsonNode current = getPayment(objectId);
+            JsonNode current = getPayment(Long.valueOf(objectId));
             if (current == null || !current.has("status")) {
                 return false;
             }
@@ -221,6 +254,54 @@ public class YooKassaServiceImpl implements YooKassaService {
             return Long.parseLong(node.asText());
         } catch (NumberFormatException e) {
             throw new ObjectNotFoundException("");
+        }
+    }
+
+    public void getMoney(Order order) throws InterruptedException, IOException {
+        String paymentId = order.getPaymentId();
+        String url = "https://api.yookassa.ru/v3/payments/" + paymentId + "/capture";
+
+        // Формируем JSON-тело запроса
+        String json = String.format(Locale.US,
+                "{ \"amount\": { \"value\": \"%.2f\", \"currency\": \"RUB\" } }",
+                order.getTotalAmount()
+        );
+
+        // Idempotence-Key (лучше уникальный для каждого запроса)
+        String idempotenceKey = java.util.UUID.randomUUID().toString();
+
+        // Basic Auth
+        String auth = Base64.getEncoder().encodeToString((shopId + ":" + secretKey).getBytes());
+
+        // Логируем запрос для отладки
+        System.out.println("URL: " + url);
+        System.out.println("JSON: " + json);
+        System.out.println("Idempotence-Key: " + idempotenceKey);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Authorization", "Basic " + auth)
+                .header("Idempotence-Key", idempotenceKey)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        HttpClient client = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .connectTimeout(Duration.ofSeconds(30))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        // Логируем полный ответ
+        System.out.println("Status Code: " + response.statusCode());
+
+        // Выводим результат
+        if (response.statusCode() == 200) {
+            System.out.println("Оплата успешно захвачена: " + response.body());
+        } else {
+            System.err.println("Ошибка при захвате оплаты: " + response.statusCode() + " - " + response.body());
+            throw new RuntimeException("Ошибка при захвате оплаты: " + response.statusCode() + " - " + response.body());
         }
     }
 }
