@@ -21,11 +21,19 @@ import ru.don_polesie.back_end.dto.order.OrderDtoRR;
 public interface UserOrderController {
 
     @Operation(
-            summary = "История заказов",
-            description = "Возвращает историю заказов текущего пользователя с пагинацией"
+            summary = "Все заказы",
+            description = "Возвращает все заказы пользователя"
     )
     @GetMapping("")
     ResponseEntity<Page<OrderDtoRR>> findOrdersPage(@RequestParam @Min(value = 1) Integer pageNumber);
+
+    @Operation(
+            summary = "История доставленных заказов",
+            description = "Возвращает историю заказов текущего пользователя с пагинацией"
+    )
+    @GetMapping("")
+    ResponseEntity<Page<OrderDtoRR>> findShippedUserOrdersPage(@RequestParam @Min(value = 1) Integer pageNumber);
+
 
     @Operation(
             summary = "Получить детали заказа",

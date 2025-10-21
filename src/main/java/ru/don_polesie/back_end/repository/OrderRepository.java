@@ -2,7 +2,6 @@ package ru.don_polesie.back_end.repository;
 
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,11 +9,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.don_polesie.back_end.enums.OrderStatus;
 import ru.don_polesie.back_end.model.Order;
-import ru.don_polesie.back_end.model.Product;
 
-import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,6 +40,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Page<Order> findByUserUsername(String username, Pageable pageable);
 
+    Page<Order> findByUserUsernameAndStatus(String username, OrderStatus status, Pageable pageable);
+
     List<Order> findByStatusAndPaymentIdIsNotNull(OrderStatus status);
 
     Page<Order> findAllByStatus(OrderStatus status, Pageable pageable);
@@ -53,8 +51,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         return findAllByStatus(OrderStatus.PAID, pageable);
     }
 
-
-    default Page<Order> findAllMoneyRESERVAITED(Pageable pageable){
+    default Page<Order> findAllMoneyReservaited(Pageable pageable) {
         return findAllByStatus(OrderStatus.MONEY_RESERVAITED, pageable);
     }
 }

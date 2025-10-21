@@ -14,9 +14,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDtoRR {
+    private Long id;
     private String phoneNumber;
     private AddressDTO address;
     private Instant createdAt;
     private Instant updatedAt;
+    private OrderStatus status;
     private List<OrderItemDto> items;
 }

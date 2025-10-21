@@ -28,7 +28,7 @@ public class PaymentStatusChecker {
         List<Order> orders = orderRepository.findByStatusAndPaymentIdIsNotNull(OrderStatus.PAYING);
         if (orders.isEmpty()) return;
 
-        log.info("Checking {} PAYING orders", orders.size());
+        log.info("{} заказ(-а) ожидает оплаты", orders.size());
 
         for (Order order : orders) {
             try {

@@ -36,8 +36,15 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private final YooKassaServiceImpl yooKassaService;
     private final PriceService priceService;
 
+
+    @Override
+    public OrderDtoRR findById(Long id) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Order not found"));
+        return orderMapper.toOrderDtoRR(order);
+    }
+
     /**
-     * Получает страницу заказов со статусом RESERVAITED
+     * Получает страницу заказов
      *
      * @param pageNumber номер страницы (начинается с 1)
      * @return страница заказов в формате DTO
@@ -45,7 +52,20 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     @Override
     public Page<OrderDtoRR> findOrdersPage(Integer pageNumber) {
         var pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, Sort.by("id").descending());
-        return orderRepository.findAllMoneyRESERVAITED(pageable)
+        return orderRepository.findAll(pageable)
+                .map(orderMapper::toOrderDtoRR);
+    }
+
+    /**
+     * Получает страницу заказов со статусом RESERVAITED
+     *
+     * @param pageNumber номер страницы (начинается с 1)
+     * @return страница заказов в формате DTO
+     */
+    @Override
+    public Page<OrderDtoRR> findMoneyReservaitedOrdersPage(Integer pageNumber) {
+        var pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, Sort.by("id").descending());
+        return orderRepository.findAllMoneyReservaited(pageable)
                 .map(orderMapper::toOrderDtoRR);
     }
 

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum OrderStatus {
     NEW("Новый заказ"),
-    PAYING("Ожидает оплаты пользователя"),
-    MONEY_RESERVAITED("Деньги зарезервированы на сайте партнера"),
+    PAYING("Ожидает оплаты"),
+    MONEY_RESERVAITED("Деньги зарезервированы на сайте партнера, собираем заказ"),
     READY_FOR_DELIVERY("Заказ готов к доставке"),
     PAID("Заказ оплачен"),
     SHIPPED("Доставлен"),

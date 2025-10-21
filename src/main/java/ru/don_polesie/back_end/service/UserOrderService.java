@@ -12,6 +12,8 @@ public interface UserOrderService {
 
     Page<OrderDtoRR> findUserOrdersPage(Integer pageNumber, String username);
 
+    Page<OrderDtoRR> findShippedUserOrdersPage(Integer pageNumber, String username);
+
     OrderCreateResponse save(OrderDtoRR orderDtoRR, User user);
 
     void deleteOrder(Long orderId);
@@ -19,5 +21,4 @@ public interface UserOrderService {
     void deleteProductFromOrder(Long orderId, Long productId);
 
     OrderDtoRR findById(Long id);
-
 }

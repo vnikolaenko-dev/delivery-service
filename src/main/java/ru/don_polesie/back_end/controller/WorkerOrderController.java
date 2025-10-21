@@ -22,11 +22,26 @@ import java.time.Instant;
 public interface WorkerOrderController {
 
     @Operation(
-            summary = "Список заказов для обработки",
+            summary = "Заказ по id",
+            description = "Возвращает заказ по id"
+    )
+    @GetMapping("/find")
+    ResponseEntity<OrderDtoRR> findById(@RequestParam @Min(value = 1) Long id);
+
+    @Operation(
+            summary = "Список заказов",
             description = "Возвращает страницу заказов, требующих обработки сотрудниками"
     )
     @GetMapping("")
     ResponseEntity<Page<OrderDtoRR>> findOrdersPage(@RequestParam @Min(value = 1) Integer pageNumber);
+
+
+    @Operation(
+            summary = "Список заказов для обработки",
+            description = "Возвращает страницу заказов, требующих обработки сотрудниками"
+    )
+    @GetMapping("/ready-to-process")
+    ResponseEntity<Page<OrderDtoRR>> findReadyToProccessOrdersPage(@RequestParam @Min(value = 1) Integer pageNumber);
 
     @Operation(
             summary = "Обработать заказ",
