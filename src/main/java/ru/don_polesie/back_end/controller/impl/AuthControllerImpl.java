@@ -19,9 +19,10 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<JwtAuthResponse> login(JwtAuthRequest loginRequest) {
+        JwtAuthResponse jwtAuthResponse = authServiceImpl.login(loginRequest);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(authServiceImpl.login(loginRequest));
+                .body(jwtAuthResponse);
     }
 
     @Override
@@ -34,8 +35,9 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<JwtAuthResponse> refresh(JwtRefreshRequest request) {
+        JwtAuthResponse jwtAuthResponse = authServiceImpl.refresh(request.getRefreshToken());
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(authServiceImpl.refresh(request.getRefreshToken()));
+                .body(jwtAuthResponse);
     }
 }

@@ -2,7 +2,10 @@ package ru.don_polesie.back_end.controller.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.web.bind.annotation.*;
 import ru.don_polesie.back_end.controller.AdminController;
 import ru.don_polesie.back_end.dto.UserDTO;
@@ -15,29 +18,35 @@ public class AdminControllerImpl implements AdminController {
     private final AdminService adminService;
 
     @Override
-    @GetMapping("/users")
     public ResponseEntity<Page<UserDTO>> findUsersPage(@RequestParam Integer pageNumber) {
-        return ResponseEntity.ok(adminService.findUsersPage(pageNumber));
+        Page<UserDTO> usersPage = adminService.findUsersPage(pageNumber);
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .body(usersPage);
     }
 
     @Override
-    @GetMapping("/workers")
     public ResponseEntity<Page<UserDTO>> findWorkersPage(@RequestParam Integer pageNumber) {
-        return ResponseEntity.ok(adminService.findWorkersPage(pageNumber));
+        Page<UserDTO> workersPage = adminService.findWorkersPage(pageNumber);
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .body(workersPage);
     }
 
     @Override
-    @DeleteMapping("/user/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
+    public ResponseEntity<Void> createUser(@RequestBody UserDTO userDTO) {
+        adminService.createUser(userDTO);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .build();
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         adminService.deleteUser(id);
-        return ResponseEntity.ok("User deleted");
-    }
-
-    @Override
-    @PostMapping("/user")
-    public ResponseEntity<String> CreateUser(@RequestBody UserDTO userDTO) {
-        UserDTO created = adminService.createUser(userDTO);
-        return ResponseEntity.ok("User created with id " + created.id);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 }
 

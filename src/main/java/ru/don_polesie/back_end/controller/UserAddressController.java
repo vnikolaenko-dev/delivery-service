@@ -34,5 +34,5 @@ public interface UserAddressController {
             description = "Удаляет адрес доставки по идентификатору"
     )
     @DeleteMapping("/delete/{id}")
-    ResponseEntity<String> deleteUserAddress(@PathVariable int id);
+    ResponseEntity<Void> deleteUserAddress(@PathVariable Long id);
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import ru.don_polesie.back_end.enums.OrderStatus;
 import ru.don_polesie.back_end.model.Order;
 import ru.don_polesie.back_end.repository.OrderRepository;
-import ru.don_polesie.back_end.service.impl.YooKassaServiceImpl;
+import ru.don_polesie.back_end.service.impl.system.YooKassaServiceImpl;
 
 import java.util.List;
 

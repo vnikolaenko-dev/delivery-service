@@ -31,7 +31,7 @@ public interface PaymentController {
             @ApiResponse(responseCode = "404", description = "Заказ не найден")
     })
     @PostMapping("")
-    ResponseEntity<?> createPayment(@RequestBody CreatePaymentRequest req);
+    ResponseEntity<?> createPayment(@RequestBody CreatePaymentRequest req) throws Exception;
 
     @Operation(
             summary = "Обработка уведомлений",
@@ -49,5 +49,5 @@ public interface PaymentController {
             @ApiResponse(responseCode = "404", description = "Платеж не найден")
     })
     @GetMapping("/{id}")
-    ResponseEntity<?> getPayment(@PathVariable Long id);
+    ResponseEntity<?> getPayment(@PathVariable Long id) throws Exception;
 }

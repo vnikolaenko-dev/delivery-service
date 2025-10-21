@@ -18,6 +18,12 @@ public class UserAddressServiceImpl implements UserAddressService {
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
 
+    /**
+     * Получает список адресов пользователя
+     *
+     * @param user пользователь, для которого запрашиваются адреса
+     * @return список адресов в формате DTO
+     */
     @Override
     public List<AddressDTO> getUserAddresses(User user) {
         return addressRepository.findAllByUser(user)
@@ -26,6 +32,13 @@ public class UserAddressServiceImpl implements UserAddressService {
                 .toList();
     }
 
+    /**
+     * Сохраняет новый адрес для пользователя
+     *
+     * @param addressDTO данные адреса для сохранения
+     * @param user пользователь, для которого сохраняется адрес
+     * @return строковое представление сохраненного адреса
+     */
     @Override
     public String save(AddressDTO addressDTO, User user) {
         Address address = addressMapper.toEntity(addressDTO);
@@ -34,12 +47,18 @@ public class UserAddressServiceImpl implements UserAddressService {
         return address.toString();
     }
 
+    /**
+     * Удаляет адрес пользователя по идентификатору
+     *
+     * @param id идентификатор адреса для удаления
+     * @param user пользователь, для проверки прав доступа
+     * @throws IllegalArgumentException если адрес с указанным id не найден
+     */
     @Override
-    public boolean delete(int id, User user) {
-        if (addressRepository.existsById(id)) {
-            addressRepository.deleteById(id);
-            return true;
+    public void delete(Long id, User user) {
+        if (!addressRepository.existsById(id)) {
+            throw new IllegalArgumentException(String.format("Address %n not found.", id));
         }
-        return false;
+        addressRepository.deleteById(id);
     }
 }

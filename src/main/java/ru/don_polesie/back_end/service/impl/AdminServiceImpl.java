@@ -14,44 +14,86 @@ import ru.don_polesie.back_end.repository.UserRepository;
 import ru.don_polesie.back_end.service.AdminService;
 
 import java.util.Set;
+import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
+    // Константы для пагинации и ролей
+    private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final String DEFAULT_SORT_FIELD = "id";
+    private static final String WORKER_ROLE_NAME = "WORKER";
+    private static final String USER_ROLE_NAME = "USER";
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder; // если нужен пароль
+    private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Получает страницу с пользователями (роль USER)
+     *
+     * @param pageNumber номер страницы (начинается с 1)
+     * @return страница с пользователями в формате DTO
+     */
     @Override
     public Page<UserDTO> findUsersPage(Integer pageNumber) {
-        Pageable pageable = PageRequest.of(pageNumber - 1, 10, Sort.by("id").descending());
-        return userRepository.findAll(pageable).map(this::toDTO);
+        Pageable pageable = createDefaultPageable(pageNumber);
+        Page<User> usersPage = userRepository.findByRolesName(USER_ROLE_NAME, pageable);
+        return usersPage.map(this::toDTO);
     }
 
+    /**
+     * Получает страницу с работниками (роль WORKER)
+     *
+     * @param pageNumber номер страницы (начинается с 1)
+     * @return страница с работниками в формате DTO
+     */
     @Override
     public Page<UserDTO> findWorkersPage(Integer pageNumber) {
-        Pageable pageable = PageRequest.of(pageNumber - 1, 10, Sort.by("id").descending());
-        return userRepository.findByRoles_Name("WORKER", pageable)
-                .map(this::toDTO);
+        Pageable pageable = createDefaultPageable(pageNumber);
+        Page<User> workersPage = userRepository.findByRolesName(WORKER_ROLE_NAME, pageable);
+        return workersPage.map(this::toDTO);
     }
 
+    /**
+     * Удаляет пользователя по идентификатору
+     *
+     * @param id идентификатор пользователя
+     */
     @Override
-    public void deleteUser(Integer id) {
+    public void deleteUser(Long id) {
         userRepository.deleteById(id.longValue());
     }
 
+    /**
+     * Создает нового пользователя
+     *
+     * @param userDTO данные пользователя для создания
+     */
     @Override
-    public UserDTO createUser(UserDTO dto) {
-        User user = new User();
-        user.setUsername(dto.name);
-        user.setEmail(dto.email);
-        user.setPhoneNumber(dto.phoneNumber);
-        user.setRoles(dto.roles);
-        user.setPassword(passwordEncoder.encode(dto.getPassword())); // при необходимости
-        User saved = userRepository.save(user);
-        return toDTO(saved);
+    public void createUser(UserDTO userDTO) {
+        User user = createUserFromDTO(userDTO);
+        userRepository.save(user);
     }
 
+    // ========== ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========
+
+    /**
+     * Создает объект пагинации с настройками по умолчанию
+     *
+     * @param pageNumber номер страницы (начинается с 1, преобразуется в 0-based)
+     * @return настроенный объект Pageable
+     */
+    private Pageable createDefaultPageable(Integer pageNumber) {
+        int page = pageNumber != null ? Math.max(0, pageNumber - 1) : 0;
+        return PageRequest.of(page, DEFAULT_PAGE_SIZE, Sort.by(DEFAULT_SORT_FIELD).descending());
+    }
+
+    /**
+     * Преобразует сущность User в DTO
+     *
+     * @param user сущность пользователя
+     * @return DTO пользователя
+     */
     private UserDTO toDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.id = user.getId().intValue();
@@ -61,5 +103,21 @@ public class AdminServiceImpl implements AdminService {
         dto.roles = user.getRoles();
         return dto;
     }
-}
 
+    /**
+     * Создает сущность User из DTO с шифрованием пароля
+     *
+     * @param userDTO DTO с данными пользователя
+     * @return сущность User с зашифрованным паролем
+     */
+    private User createUserFromDTO(UserDTO userDTO) {
+        String password = userDTO.getPassword();
+        return User.builder()
+                .username(userDTO.getName())
+                .email(userDTO.getEmail())
+                .phoneNumber(userDTO.getPhoneNumber())
+                .password(passwordEncoder.encode(password))
+                .roles(userDTO.getRoles())
+                .build();
+    }
+}

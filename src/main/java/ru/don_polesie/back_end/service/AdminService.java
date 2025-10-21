@@ -9,8 +9,8 @@ public interface AdminService {
 
     Page<UserDTO> findWorkersPage(Integer pageNumber);
 
-    void deleteUser(Integer id);
+    void deleteUser(Long id);
 
-    UserDTO createUser(UserDTO userDTO);
+    void createUser(UserDTO userDTO);
 }
 

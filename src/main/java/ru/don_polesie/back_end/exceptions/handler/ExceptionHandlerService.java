@@ -11,18 +11,24 @@ import ru.don_polesie.back_end.exceptions.*;
 public class ExceptionHandlerService {
 
     @ExceptionHandler(ObjectNotFoundException.class)
-    public ResponseEntity<String> handleObjectNotFoundException(ObjectNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<ExceptionInformation> handleObjectNotFoundException(ObjectNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ExceptionInformation("Объект не найден.", ex.getMessage())
+        );
     }
 
     @ExceptionHandler(RequestValidationException.class)
-    public ResponseEntity<String> handleIllegalArgumentException(RequestValidationException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<ExceptionInformation> handleIllegalArgumentException(RequestValidationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ExceptionInformation("Некорректный запрос.", ex.getMessage())
+        );
     }
 
     @ExceptionHandler(ConflictDataException.class)
-    public ResponseEntity<String> handleConflictDataException(ConflictDataException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    public ResponseEntity<ExceptionInformation> handleConflictDataException(ConflictDataException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                new ExceptionInformation("Конфликт в дате.", ex.getMessage())
+        );
     }
 
     @ExceptionHandler(ForbiddenException.class)
@@ -31,8 +37,17 @@ public class ExceptionHandlerService {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<String> handleAccessDeniedException(AccessDeniedException ex) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+    public ResponseEntity<ExceptionInformation> handleAccessDeniedException(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                new ExceptionInformation("У вас недостаточно прав для этого действия.", ex.getMessage())
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionInformation> handleException(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                new ExceptionInformation("Возникла ошибка.", ex.getMessage())
+        );
     }
 
 }

@@ -24,16 +24,9 @@ public class PaymentControllerImpl implements PaymentController {
 
     @Override
     @Deprecated
-    public ResponseEntity<?> createPayment(@RequestBody CreatePaymentRequest req) {
-        try {
-            JsonNode payment = yooKassaServiceImpl.createPayment(req.getOrderId());
-            return ResponseEntity.ok().body(payment);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body(
-                    JsonNodeFactoryWrapperImpl.error("error", e.getMessage())
-            );
-        }
+    public ResponseEntity<?> createPayment(@RequestBody CreatePaymentRequest req) throws Exception {
+        JsonNode payment = yooKassaServiceImpl.createPayment(req.getOrderId());
+        return ResponseEntity.ok().body(payment);
     }
 
     @Override
@@ -51,15 +44,9 @@ public class PaymentControllerImpl implements PaymentController {
     }
 
     @Override
-    public ResponseEntity<?> getPayment(Long id) {
-        try {
-            JsonNode payment = yooKassaServiceImpl.getPayment(id);
-            return ResponseEntity.ok(payment);
-        } catch (Exception e) {
-            log.error("getPayment failed", e);
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Не удалось получить платёж", "detail", e.getMessage()));
-        }
+    public ResponseEntity<?> getPayment(Long id) throws Exception {
+        JsonNode payment = yooKassaServiceImpl.getPayment(id);
+        return ResponseEntity.ok(payment);
     }
 
     private String extractClientIp(HttpServletRequest request) {

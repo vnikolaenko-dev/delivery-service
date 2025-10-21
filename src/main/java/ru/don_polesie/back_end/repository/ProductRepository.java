@@ -1,6 +1,7 @@
 package ru.don_polesie.back_end.repository;
 
 
+import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,9 +14,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, Integer> {
+public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    Optional<Product> findById(Long integer);
+    @NonNull
+    Optional<Product> findById(@NonNull Long id);
+
+    void deleteById(@NonNull Long id);
 
     Page<Product> findAllByAmountGreaterThan(int amount, Pageable pageable);
 
@@ -42,6 +46,4 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
             "LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
             "LOWER(p.brand) LIKE LOWER(CONCAT('%', :query, '%'))")
     Page<Product> searchProductsByQuery(@Param("query") String query, Pageable pageable);
-
-    void deleteById(Long id);
 }

@@ -1,5 +1,6 @@
 package ru.don_polesie.back_end.repository;
 
+import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,12 +20,13 @@ import java.util.Optional;
 
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order, Integer> {
+public interface OrderRepository extends JpaRepository<Order, Long> {
 
+    @NonNull
     @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderProducts WHERE o.id = :id")
-    Optional<Order> findById(@Param("id") Long id);
+    Optional<Order> findById(@Param("id") @NonNull Long id);
 
-    void deleteById(Long integer);
+    void deleteById(@NonNull Long integer);
 
     // Количество продаж за день выбранного товара
     @Query("SELECT COALESCE(SUM(CAST(op.quantity AS long)), 0) " +
@@ -51,7 +53,8 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
         return findAllByStatus(OrderStatus.PAID, pageable);
     }
 
-    default Page<Order> findAllMoneyRESERVAITED(PageRequest pageable){
+
+    default Page<Order> findAllMoneyRESERVAITED(Pageable pageable){
         return findAllByStatus(OrderStatus.MONEY_RESERVAITED, pageable);
     }
 }

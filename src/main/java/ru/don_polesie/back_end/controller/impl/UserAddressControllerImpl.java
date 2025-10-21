@@ -23,14 +23,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserAddressControllerImpl implements UserAddressController {
     private final UserAddressServiceImpl userAddressService;
-    private final UserServiceImpl userService;
     private final SecurityUtils securityUtils;
 
     @Override
     public ResponseEntity<List<AddressDTO>> getUserAddress() {
         User user = securityUtils.getCurrentUser();
         return ResponseEntity
-                .status(HttpStatus.OK)
+                .status(HttpStatus.FOUND)
                 .body(userAddressService.getUserAddresses(user));
     }
 
@@ -38,16 +37,16 @@ public class UserAddressControllerImpl implements UserAddressController {
     public ResponseEntity<String> createUserAddress(AddressDTO address) {
         User user = securityUtils.getCurrentUser();
         return ResponseEntity
-                .status(HttpStatus.OK)
+                .status(HttpStatus.CREATED)
                 .body(userAddressService.save(address, user));
     }
 
     @Override
-    public ResponseEntity<String> deleteUserAddress(@PathVariable int id) {
+    public ResponseEntity<Void> deleteUserAddress(Long id) {
         User user = securityUtils.getCurrentUser();
-        if (userAddressService.delete(id, user)) {
-            return ResponseEntity.status(HttpStatus.OK).build();
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        userAddressService.delete(id, user);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 }

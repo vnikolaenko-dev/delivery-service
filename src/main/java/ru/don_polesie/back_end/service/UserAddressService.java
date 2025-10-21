@@ -10,5 +10,5 @@ public interface UserAddressService {
 
     String save(AddressDTO address, User user);
 
-    boolean delete(int id, User user);
+    void delete(Long id, User user);
 }

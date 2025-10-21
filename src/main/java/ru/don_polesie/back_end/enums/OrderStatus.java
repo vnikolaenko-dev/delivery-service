@@ -4,16 +4,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum OrderStatus {
-    NEW("New"),
-    READY_FOR_DELIVERY("READY_FOR_DELIVERY"),
+    NEW("Новый заказ"),
+    PAYING("Ожидает оплаты пользователя"),
+    MONEY_RESERVAITED("Деньги зарезервированы на сайте партнера"),
+    READY_FOR_DELIVERY("Заказ готов к доставке"),
+    PAID("Заказ оплачен"),
+    SHIPPED("Доставлен"),
+    CANCELED("Отменен"),
     NEEDS_TO_BE_UPDATED("Needs to be updated"),
-    PAYING("On payment"),
-    PAID("Paid"),
-    MONEY_RESERVAITED("MONEY_RESERVAITED"),
-    SHIPPED("Shipped"),
-    ERROR_ON_PAYMENT("Error on payment"),
-    CANCELED("Canceled");
-
+    ERROR_ON_PAYMENT("Error on payment");
     private final String value;
 
     OrderStatus(String value) {

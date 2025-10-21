@@ -29,18 +29,16 @@ public interface AdminController {
     ResponseEntity<Page<UserDTO>> findWorkersPage(@RequestParam @Min(value = 1) Integer pageNumber);
 
     @Operation(
+            summary = "Создать пользователя",
+            description = "Создает пользователя с заданными ролями"
+    )
+    @PostMapping("/user/create")
+    ResponseEntity<Void> createUser(@RequestBody UserDTO userDTO);
+
+    @Operation(
             summary = "Удалить пользователя",
             description = "Полностью удаляет пользователя из системы по его идентификатору"
     )
-    @DeleteMapping("/delete/{id}}")
-    ResponseEntity<String> deleteUser(@PathVariable Integer id);
-
-    @Operation(
-            summary = "Создать пользователя",
-            description = "Создает нового пользователя с указанными данными и ролями"
-    )
-    @GetMapping("/create}")
-    ResponseEntity<String> CreateUser(UserDTO userDTO);
-
-
+    @DeleteMapping("/user/delete/{id}")
+    ResponseEntity<Void> deleteUser(@PathVariable Long id);
 }

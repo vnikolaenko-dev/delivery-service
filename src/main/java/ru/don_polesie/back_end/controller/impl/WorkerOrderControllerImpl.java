@@ -20,7 +20,10 @@ public class WorkerOrderControllerImpl implements WorkerOrderController {
 
     @Override
     public ResponseEntity<Page<OrderDtoRR>> findOrdersPage(Integer pageNumber) {
-        return ResponseEntity.ok().body(workOrderService.findOrdersPage(pageNumber));
+        Page<OrderDtoRR> ordersPage = workOrderService.findOrdersPage(pageNumber);
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .body(ordersPage);
     }
 
     @Override
@@ -43,15 +46,15 @@ public class WorkerOrderControllerImpl implements WorkerOrderController {
 
     @Override
     public ResponseEntity<Long> getTotalSalesForProductByDate(Long productId, Instant date) {
-        return new ResponseEntity<>(
-                workOrderService.getTotalSalesForProductByDate(productId, date), HttpStatus.OK
-        );
+        Long totalSalesForProduct = workOrderService.getTotalSalesForProductByDate(productId, date);
+        return ResponseEntity
+                .ok(totalSalesForProduct);
     }
 
     @Override
     public ResponseEntity<Long> getOrderCountForProductByDate(Long productId, Instant date) {
-        return new ResponseEntity<>(
-                workOrderService.getOrderCountForProductByDate(productId, date), HttpStatus.OK
-        );
+        Long orderCount = workOrderService.getOrderCountForProductByDate(productId, date);
+        return ResponseEntity
+                .ok(orderCount);
     }
 }

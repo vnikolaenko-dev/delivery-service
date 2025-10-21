@@ -2,14 +2,11 @@ package ru.don_polesie.back_end.service;
 
 
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.don_polesie.back_end.dto.product.ProductDtoRR;
 import ru.don_polesie.back_end.dto.product.ProductDtoSearch;
 
-import java.util.List;
-
-public interface ProductService {
+public interface WorkerProductService {
 
     Page<ProductDtoRR> findProductsPage(@RequestParam Integer pageNumber);
 
@@ -19,7 +16,7 @@ public interface ProductService {
 
     Page<ProductDtoRR> findProductByQuery(String query, Integer pageNumber);
 
-    ResponseEntity<ProductDtoRR> update(ProductDtoRR productDtoRR, Long id);
+    ProductDtoRR update(ProductDtoRR productDtoRR, Long id);
 
     void deleteById(Long id);
 

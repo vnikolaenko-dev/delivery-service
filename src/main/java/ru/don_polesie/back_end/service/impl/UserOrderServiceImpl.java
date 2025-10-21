@@ -6,10 +6,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.don_polesie.back_end.dto.AddressDTO;
 import ru.don_polesie.back_end.dto.order.OrderCreateResponse;
 import ru.don_polesie.back_end.dto.order.OrderDtoRR;
 import ru.don_polesie.back_end.dto.order.OrderItemDto;
-import ru.don_polesie.back_end.dto.order.ProcessWeightsRequest;
 import ru.don_polesie.back_end.enums.OrderStatus;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.mapper.AddressMapper;
@@ -18,6 +18,7 @@ import ru.don_polesie.back_end.model.*;
 import ru.don_polesie.back_end.repository.*;
 import ru.don_polesie.back_end.service.UserOrderService;
 import ru.don_polesie.back_end.service.YooKassaService;
+import ru.don_polesie.back_end.service.impl.order.PriceService;
 
 import java.math.BigDecimal;
 
@@ -32,57 +33,62 @@ public class UserOrderServiceImpl implements UserOrderService {
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
     private final YooKassaService yooKassaServiceImpl;
-    private final OrderService orderService;
+    private final PriceService orderService;
+    private final PriceService priceService;
 
+    @Override
+    public OrderDtoRR findById(Long id) {
+        return orderMapper
+                .toOrderDtoRR(orderRepository
+                        .findById(id)
+                        .orElseThrow(() -> new ObjectNotFoundException("")));
+    }
 
 
     @Override
     public Page<OrderDtoRR> findUserOrdersPage(Integer pageNumber, String username) {
-        var pageable =
-                PageRequest.of(pageNumber - 1, 10, Sort.by("id").descending());
+        var pageable = PageRequest.of(pageNumber - 1, 10, Sort.by("id").descending());
         Page<Order> orderPage = orderRepository.findByUserUsername(username, pageable);
-        return orderPage
-                .map(orderMapper::toOrderDtoRR);
+        return orderPage.map(orderMapper::toOrderDtoRR);
     }
 
     @Override
     @Transactional
+    public void deleteOrder(Long orderId) {
+        orderRepository.deleteById(orderId);
+    }
+
+
+    @Override
+    @Transactional
     public OrderCreateResponse save(OrderDtoRR orderDtoRR, User user) {
-        Address address = addressMapper.toEntity(orderDtoRR.getAddress());
-        Address existingAddress = findExistingAddressOrSaveNew(address);
-
-        Order order = orderMapper.toOrder(orderDtoRR);
-        order.setUser(user);
-        order.setAddress(existingAddress);
-        order.setStatus(OrderStatus.NEW);
-        order.setTotalAmount(BigDecimal.ZERO);
-        order = orderRepository.save(order);
-
-        BigDecimal totalAmount = BigDecimal.ZERO;
-
-        for (OrderItemDto od : orderDtoRR.getItems()) {
-            var product = productRepository.findById(od.getProductId()).orElseThrow();
-            var op = new OrderProduct(order, product, od.getQuantity());
-
-            totalAmount = totalAmount.add(orderService.calculateProductCost(product, od.getQuantity()));
-
-            order.addProduct(op);
-        }
-
-        order.setTotalAmount(totalAmount);
-        order.setStatus(OrderStatus.PAYING);
-        order = orderRepository.save(order);
-
+        Address address = processAddress(orderDtoRR.getAddress());
+        Order order = createOrder(orderDtoRR, user, address);
+        processOrderItems(orderDtoRR, order);
         try {
             return new OrderCreateResponse(
                     orderMapper.toOrderDtoRR(order),
                     yooKassaServiceImpl.createPayment(String.valueOf(order.getId()))
             );
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e.getMessage());
         }
     }
+
+    @Override
+    @Transactional
+    public void deleteProductFromOrder(Long orderId, Long productId) {
+        var order = getOrderById(orderId);
+        var product = getProductById(productId);
+        var orderProduct = getOrderProduct(orderId, productId);
+
+        BigDecimal productPrice = priceService.calculateProductCost(product, orderProduct.getQuantity());
+
+        order.setTotalAmount(order.getTotalAmount().subtract(productPrice));
+        order.removeProduct(orderProduct);
+    }
+
+    // ========== ПРИВАТНЫЕ ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========
 
     private Address findExistingAddressOrSaveNew(Address address) {
         // Если у адреса нет ID, значит это новый адрес - сохраняем
@@ -95,59 +101,55 @@ public class UserOrderServiceImpl implements UserOrderService {
                 .orElseGet(() -> addressRepository.save(address));
     }
 
+    private void processOrderItems(OrderDtoRR orderDtoRR, Order order) {
+        BigDecimal totalAmount = orderDtoRR.getItems().stream()
+                .map(orderItem -> processOrderItem(orderItem, order))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    /*
-    private String extractGuestIdOrNew() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getPrincipal() instanceof GuestPrincipal gp) {
-            return gp.getGuestId();
-        }
-        return UUID.randomUUID().toString();
+        order.setTotalAmount(totalAmount);
+        order.setStatus(OrderStatus.PAYING);
+        orderRepository.save(order);
     }
 
-     */
+    private BigDecimal processOrderItem(OrderItemDto orderItem, Order order) {
+        Product product = getProductById(orderItem.getProductId());
+        OrderProduct orderProduct = new OrderProduct(order, product, orderItem.getQuantity());
 
-    @Override
-    @Transactional
-    public void deleteOrder(Long orderId) {
-        orderRepository.deleteById(orderId);
+        BigDecimal itemCost = priceService.calculateProductCost(product, orderItem.getQuantity());
+        order.addProduct(orderProduct);
+
+        return itemCost;
     }
 
-    @Override
-    @Transactional
-    public void deleteProductFromOrder(Long orderId, Long productId) {
-        var order = orderRepository
-                .findById(orderId)
-                .orElseThrow(() -> new ObjectNotFoundException(""));
-
-        var product = productRepository
-                .findById(productId)
-                .orElseThrow(() -> new ObjectNotFoundException(""));
-
-        var orderProduct = orderProductRepository
-                .findById(new OrderProductId(orderId, productId))
-                .orElseThrow(() -> new ObjectNotFoundException(""));
-
-        BigDecimal productPrice;
-        if (product.getIsWeighted()) {
-            productPrice = BigDecimal.valueOf(product.getPrice() *
-                    orderProduct.getQuantity() / 1000);
-        } else {
-            productPrice = BigDecimal.valueOf(product.getPrice() *
-                    orderProduct.getQuantity());
-        }
-
-        order.setTotalAmount(order.getTotalAmount().subtract(productPrice));
-        order.removeProduct(orderProduct);
+    private Order getOrderById(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new ObjectNotFoundException("Order not found with id: " + orderId));
     }
 
-    @Override
-    public OrderDtoRR findById(Long id) {
-        return orderMapper
-                .toOrderDtoRR(orderRepository
-                        .findById(id)
-                        .orElseThrow(() -> new ObjectNotFoundException(""))
-                );
+    private Product getProductById(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new ObjectNotFoundException("Product not found with id: " + productId));
+    }
+
+    private OrderProduct getOrderProduct(Long orderId, Long productId) {
+        OrderProductId orderProductId = new OrderProductId(orderId, productId);
+        return orderProductRepository.findById(orderProductId)
+                .orElseThrow(() -> new ObjectNotFoundException(
+                        "Order product not found for orderId: " + orderId + " and productId: " + productId));
+    }
+
+    private Address processAddress(AddressDTO addressDto) {
+        Address address = addressMapper.toEntity(addressDto);
+        return findExistingAddressOrSaveNew(address);
+    }
+
+    private Order createOrder(OrderDtoRR orderDtoRR, User user, Address address) {
+        Order order = orderMapper.toOrder(orderDtoRR);
+        order.setUser(user);
+        order.setAddress(address);
+        order.setStatus(OrderStatus.NEW);
+        order.setTotalAmount(BigDecimal.ZERO);
+        return orderRepository.save(order);
     }
 
 }

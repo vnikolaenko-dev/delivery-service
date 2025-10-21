@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "city", nullable = false, length = 50)
     private String city;

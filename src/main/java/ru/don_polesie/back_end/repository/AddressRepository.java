@@ -6,7 +6,7 @@ import ru.don_polesie.back_end.model.User;
 
 import java.util.List;
 
-public interface AddressRepository extends JpaRepository<Address, Integer> {
+public interface AddressRepository extends JpaRepository<Address, Long> {
 
     List<Address> findAllByUser(User user);
 

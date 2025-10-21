@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.service.impl;
+package ru.don_polesie.back_end.service.impl.system;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,15 +10,12 @@ import ru.don_polesie.back_end.enums.OrderStatus;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.model.Order;
 import ru.don_polesie.back_end.model.OrderProduct;
-import ru.don_polesie.back_end.model.Product;
 import ru.don_polesie.back_end.repository.OrderRepository;
 import ru.don_polesie.back_end.service.YooKassaService;
 import ru.don_polesie.back_end.utils.CidrUtils;
 
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
