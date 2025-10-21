@@ -4,9 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.don_polesie.back_end.dto.AddressDTO;
-import ru.don_polesie.back_end.enums.OrderStatus;
+import ru.don_polesie.back_end.model.enums.OrderStatus;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 

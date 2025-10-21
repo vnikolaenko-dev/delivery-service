@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.don_polesie.back_end.dto.order.OrderDtoRR;
 import ru.don_polesie.back_end.dto.order.ProcessWeightsRequest;
-import ru.don_polesie.back_end.enums.OrderStatus;
+import ru.don_polesie.back_end.model.enums.OrderStatus;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.mapper.OrderMapper;
 import ru.don_polesie.back_end.model.Order;

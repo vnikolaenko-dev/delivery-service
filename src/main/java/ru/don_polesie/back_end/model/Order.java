@@ -4,7 +4,7 @@ package ru.don_polesie.back_end.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import ru.don_polesie.back_end.enums.OrderStatus;
+import ru.don_polesie.back_end.model.enums.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;

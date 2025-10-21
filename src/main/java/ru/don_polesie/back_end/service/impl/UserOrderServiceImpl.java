@@ -11,7 +11,7 @@ import ru.don_polesie.back_end.dto.AddressDTO;
 import ru.don_polesie.back_end.dto.order.OrderCreateResponse;
 import ru.don_polesie.back_end.dto.order.OrderDtoRR;
 import ru.don_polesie.back_end.dto.order.OrderItemDto;
-import ru.don_polesie.back_end.enums.OrderStatus;
+import ru.don_polesie.back_end.model.enums.OrderStatus;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.mapper.AddressMapper;
 import ru.don_polesie.back_end.mapper.OrderMapper;

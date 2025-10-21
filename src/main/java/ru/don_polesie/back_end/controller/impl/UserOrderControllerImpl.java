@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.don_polesie.back_end.controller.UserOrderController;
 import ru.don_polesie.back_end.dto.order.OrderCreateResponse;
 import ru.don_polesie.back_end.dto.order.OrderDtoRR;
-import ru.don_polesie.back_end.enums.OrderStatus;
 import ru.don_polesie.back_end.model.User;
 import ru.don_polesie.back_end.security.SecurityUtils;
 import ru.don_polesie.back_end.service.UserOrderService;
