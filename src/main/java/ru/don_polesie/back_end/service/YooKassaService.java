@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 
 public interface YooKassaService {
-    JsonNode createPayment(String orderId) throws Exception;
+    JsonNode createPayment(Long orderId) throws Exception;
 
     void storeNotification(JsonNode notification);
 

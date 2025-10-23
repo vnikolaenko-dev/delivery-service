@@ -8,9 +8,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.don_polesie.back_end.model.Product;
+import ru.don_polesie.back_end.model.product.Brand;
+import ru.don_polesie.back_end.model.product.Product;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Repository
@@ -23,7 +24,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findAllByAmountGreaterThan(int amount, Pageable pageable);
 
-    Optional<Product> findByBrandAndName(String brand, String name);
+    Optional<ArrayList<Product>> findByBrand(Brand brand);
 
 
     @Query("SELECT p FROM Product p " +
@@ -46,4 +47,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
             "LOWER(p.brand) LIKE LOWER(CONCAT('%', :query, '%'))")
     Page<Product> searchProductsByQuery(@Param("query") String query, Pageable pageable);
+
+    Optional<Product> findByBrandAndName(Brand brand, String name);
 }

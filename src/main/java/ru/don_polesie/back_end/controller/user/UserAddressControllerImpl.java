@@ -1,21 +1,13 @@
-package ru.don_polesie.back_end.controller.impl;
+package ru.don_polesie.back_end.controller.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.service.SecurityService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.don_polesie.back_end.controller.UserAddressController;
 import ru.don_polesie.back_end.dto.AddressDTO;
-import ru.don_polesie.back_end.mapper.AddressMapper;
 import ru.don_polesie.back_end.model.User;
 import ru.don_polesie.back_end.security.SecurityUtils;
 import ru.don_polesie.back_end.service.impl.UserAddressServiceImpl;
-import ru.don_polesie.back_end.service.impl.UserServiceImpl;
 
 import java.util.List;
 

@@ -1,18 +1,14 @@
-package ru.don_polesie.back_end.controller;
+package ru.don_polesie.back_end.controller.payment;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.don_polesie.back_end.dto.order.OrderDtoRR;
 import ru.don_polesie.back_end.dto.payment.CreatePaymentRequest;
-import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 
 @Tag(
         name = "Платежи",

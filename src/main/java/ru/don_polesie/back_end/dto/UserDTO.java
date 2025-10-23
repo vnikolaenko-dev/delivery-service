@@ -13,6 +13,7 @@ import java.util.Set;
 public class UserDTO {
     public int id;
     public String name;
+    public String surname;
     public String email;
     public String password;
     public String phoneNumber;

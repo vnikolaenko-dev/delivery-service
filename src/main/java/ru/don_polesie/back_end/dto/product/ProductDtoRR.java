@@ -16,6 +16,10 @@ public class ProductDtoRR {
     @Size(max = 255, message = "Имя должно содержать не более 255 символов")
     private String name;
 
+    @NotBlank(message = "Категория не должна быть пустой")
+    @Size(max = 255, message = "Категория должна содержать не более 255 символов")
+    private String category;
+
     @NotBlank(message = "Фото не должно быть пустым")
     private String imageUrl;
 
@@ -39,8 +43,12 @@ public class ProductDtoRR {
     @Min(value = 0, message = "Энергетическая ценность не может быть отрицательной")
     private Integer energyKcalPer100g;
 
-    @NotNull(message = "Вес/объём обязателен")
-    private String volume;
+    @Min(value = 0, message = "Вес товара не может быть отрицательным")
+    private Integer minWeight;
+
+    @NotNull(message = "Максимальный вес товара обязателен")
+    @Min(value = 0, message = "Вес товара не может быть отрицательным")
+    private Integer maxWeight;
 
     @NotNull(message = "Количество товара обязателно")
     @Min(value = 1, message = "Количество товара должно быть положительным")

@@ -9,7 +9,7 @@ import lombok.Setter;
 public class JwtAuthRequest {
 
     @NotBlank
-    private String username;
+    private String phoneNumber;
 
     @NotBlank
     private String password;

@@ -1,10 +1,9 @@
-package ru.don_polesie.back_end.controller.impl;
+package ru.don_polesie.back_end.controller.worker;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import ru.don_polesie.back_end.controller.WorkerProductController;
 import ru.don_polesie.back_end.dto.product.ProductDtoRR;
 import ru.don_polesie.back_end.service.WorkerProductService;
 

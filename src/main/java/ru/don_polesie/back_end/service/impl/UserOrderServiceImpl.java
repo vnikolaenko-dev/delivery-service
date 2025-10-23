@@ -16,6 +16,7 @@ import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.mapper.AddressMapper;
 import ru.don_polesie.back_end.mapper.OrderMapper;
 import ru.don_polesie.back_end.model.*;
+import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.*;
 import ru.don_polesie.back_end.service.UserOrderService;
 import ru.don_polesie.back_end.service.YooKassaService;
@@ -61,9 +62,9 @@ public class UserOrderServiceImpl implements UserOrderService {
      * @return страница с заказами
      */
     @Override
-    public Page<OrderDtoRR> findUserOrdersPage(Integer pageNumber, String username) {
+    public Page<OrderDtoRR> findUserOrdersPage(Integer pageNumber, String phoneNumber) {
         Pageable pageable = createPageable(pageNumber);
-        return orderRepository.findByUserUsername(username, pageable)
+        return orderRepository.findByUserPhoneNumber(phoneNumber, pageable)
                 .map(orderMapper::toOrderDtoRR);
     }
 
@@ -75,9 +76,9 @@ public class UserOrderServiceImpl implements UserOrderService {
      * @return страница с доставленными заказами
      */
     @Override
-    public Page<OrderDtoRR> findShippedUserOrdersPage(Integer pageNumber, String username) {
+    public Page<OrderDtoRR> findShippedUserOrdersPage(Integer pageNumber, String phoneNumber) {
         Pageable pageable = createPageable(pageNumber);
-        return orderRepository.findByUserUsernameAndStatus(username, OrderStatus.SHIPPED, pageable)
+        return orderRepository.findByUserPhoneNumberAndStatus(phoneNumber, OrderStatus.SHIPPED, pageable)
                 .map(orderMapper::toOrderDtoRR);
     }
 
@@ -176,7 +177,11 @@ public class UserOrderServiceImpl implements UserOrderService {
      */
     private void processOrderItems(OrderDtoRR orderDtoRR, Order order) {
         BigDecimal totalAmount = orderDtoRR.getItems().stream()
-                .map(orderItem -> processOrderItem(orderItem, order))
+                .map(orderItem -> {
+                    Product product = productRepository.findById(orderItem.getProductId()).get(); // предположим, что есть метод getProduct()
+                    int quantity = orderItem.getQuantity();   // предположим, что есть метод getQuantity()
+                    return priceService.calculateProductCost(product, orderItem.getQuantity());
+                })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         order.setTotalAmount(totalAmount);
@@ -204,7 +209,7 @@ public class UserOrderServiceImpl implements UserOrderService {
         try {
             return new OrderCreateResponse(
                     orderMapper.toOrderDtoRR(order),
-                    yooKassaServiceImpl.createPayment(String.valueOf(order.getId()))
+                    yooKassaServiceImpl.createPayment(order.getId())
             );
         } catch (Exception e) {
             throw new RuntimeException("Payment creation failed: " + e.getMessage());

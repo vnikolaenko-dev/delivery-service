@@ -38,9 +38,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "AND FUNCTION('DATE', op.order.createdAt) = FUNCTION('DATE', :date)")
     Long getOrderCountForProductByDate(@Param("productId") Long productId, @Param("date") Instant date);
 
-    Page<Order> findByUserUsername(String username, Pageable pageable);
+    Page<Order> findByUserPhoneNumber(String phoneNumber, Pageable pageable);
 
-    Page<Order> findByUserUsernameAndStatus(String username, OrderStatus status, Pageable pageable);
+    Page<Order> findByUserPhoneNumberAndStatus(String phoneNumber, OrderStatus status, Pageable pageable);
 
     List<Order> findByStatusAndPaymentIdIsNotNull(OrderStatus status);
 

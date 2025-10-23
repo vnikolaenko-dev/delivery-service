@@ -12,7 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.don_polesie.back_end.dto.product.ProductDtoXML;
 import ru.don_polesie.back_end.dto.product.ProductListDtoXML;
 import ru.don_polesie.back_end.mapper.ProductMapper;
-import ru.don_polesie.back_end.model.Product;
+import ru.don_polesie.back_end.model.product.Brand;
+import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.ProductRepository;
 import ru.don_polesie.back_end.service.ProductImportService;
 
@@ -20,6 +21,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -53,7 +55,7 @@ public class ProductImportServiceImpl implements ProductImportService {
                 ProductListDtoXML list = parse(file);
                 for (ProductDtoXML dto : list.getProducts()) {
                     dto.setIsWeighted(dto.getVolume().contains("~"));
-                    Optional<Product> existing = productRepository.findByBrandAndName(dto.getBrand(), dto.getName());
+                    Optional<Product> existing = productRepository.findByBrandAndName(new Brand(dto.getBrand()), dto.getName());
                     if (existing.isPresent()) {
                         productMapper.updateFromDto(dto, existing.get());
                         productRepository.save(existing.get());

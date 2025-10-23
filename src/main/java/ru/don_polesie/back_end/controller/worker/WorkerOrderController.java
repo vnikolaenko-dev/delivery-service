@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.controller;
+package ru.don_polesie.back_end.controller.worker;
 
 
 import io.swagger.v3.oas.annotations.Operation;

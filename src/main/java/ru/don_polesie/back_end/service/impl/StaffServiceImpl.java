@@ -11,21 +11,21 @@ import ru.don_polesie.back_end.service.UserService;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class UserServiceImpl implements UserService {
+public class StaffServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
     /**
      * Находит пользователя по имени пользователя
      *
-     * @param username имя пользователя для поиска
+     * @param phoneNumber номер пользователя для поиска
      * @return найденный пользователь
      * @throws ObjectNotFoundException если пользователь с указанным именем не найден
      */
     @Override
-    public User getByUsername(String username) {
+    public User getByPhoneNumber(String phoneNumber) {
         return userRepository
-                .findByUsername(username)
+                .findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new ObjectNotFoundException(""));
     }
 

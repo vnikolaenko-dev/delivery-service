@@ -64,9 +64,9 @@ public class YooKassaServiceImpl implements YooKassaService {
 
     @Override
     @Transactional
-    public JsonNode createPayment(String orderId) throws Exception {
+    public JsonNode createPayment(Long orderId) throws Exception {
         var order = orderRepository
-                .findById(Long.valueOf(orderId))
+                .findById(orderId)
                 .orElseThrow(() -> new ObjectNotFoundException(""));
 
         var payload = mapper.createObjectNode();

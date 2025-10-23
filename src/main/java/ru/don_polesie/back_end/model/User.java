@@ -3,7 +3,6 @@ package ru.don_polesie.back_end.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchConnectionDetails;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "users")
+@Table(name = "delivery_user")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,10 +23,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String username;
+    @Column
+    private String name;
 
-    @Column(nullable = false)
+    @Column
+    private String surname;
+
+    @Column
     private String password;
 
     @Column(unique = true, nullable = false, length = 11)

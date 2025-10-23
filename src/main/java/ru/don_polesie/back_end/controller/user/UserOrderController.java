@@ -1,8 +1,6 @@
-package ru.don_polesie.back_end.controller;
+package ru.don_polesie.back_end.controller.user;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,7 +29,7 @@ public interface UserOrderController {
             summary = "История доставленных заказов",
             description = "Возвращает историю заказов текущего пользователя с пагинацией"
     )
-    @GetMapping("")
+    @GetMapping("/shipped")
     ResponseEntity<Page<OrderDtoRR>> findShippedUserOrdersPage(@RequestParam @Min(value = 1) Integer pageNumber);
 
 

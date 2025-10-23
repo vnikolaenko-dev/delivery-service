@@ -1,11 +1,10 @@
-package ru.don_polesie.back_end.controller.impl;
+package ru.don_polesie.back_end.controller.auth;
 
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import ru.don_polesie.back_end.controller.AuthController;
 import ru.don_polesie.back_end.dto.auth.JwtAuthRequest;
 import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
 import ru.don_polesie.back_end.dto.auth.JwtRefreshRequest;
@@ -14,7 +13,7 @@ import ru.don_polesie.back_end.service.AuthService;
 
 @RestController
 @RequiredArgsConstructor
-public class AuthControllerImpl implements AuthController {
+public class StaffAuthControllerImpl implements StaffAuthController {
     private final AuthService authServiceImpl;
 
     @Override
@@ -23,14 +22,6 @@ public class AuthControllerImpl implements AuthController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(jwtAuthResponse);
-    }
-
-    @Override
-    public ResponseEntity<Void> register(RegisterRequest request) {
-        authServiceImpl.save(request);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .build();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.controller;
+package ru.don_polesie.back_end.controller.auth;
 
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +18,7 @@ import ru.don_polesie.back_end.dto.auth.RegisterRequest;
         description = "API для регистрации, входа и обновления JWT токенов"
 )
 @RequestMapping("/auth")
-public interface AuthController {
+public interface StaffAuthController {
 
     @Operation(
             summary = "Вход в систему",
@@ -26,13 +26,6 @@ public interface AuthController {
     )
     @PostMapping("/login")
     ResponseEntity<JwtAuthResponse> login(@RequestBody @Valid JwtAuthRequest loginRequest);
-
-    @Operation(
-            summary = "Регистрация",
-            description = "Создание нового аккаунта пользователя в системе"
-    )
-    @PostMapping("/register")
-    ResponseEntity<Void> register(@RequestBody @Valid RegisterRequest request);
 
     @Operation(
             summary = "Обновление токена",

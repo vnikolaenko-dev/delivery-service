@@ -7,9 +7,7 @@ import ru.don_polesie.back_end.dto.order.OrderDtoRR;
 import ru.don_polesie.back_end.dto.order.OrderItemDto;
 import ru.don_polesie.back_end.model.Order;
 import ru.don_polesie.back_end.model.OrderProduct;
-import ru.don_polesie.back_end.model.Product;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;

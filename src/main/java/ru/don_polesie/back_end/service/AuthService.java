@@ -11,6 +11,5 @@ public interface AuthService {
 
     JwtAuthResponse refresh(String refreshToken);
 
-    void save(RegisterRequest request);
 
 }

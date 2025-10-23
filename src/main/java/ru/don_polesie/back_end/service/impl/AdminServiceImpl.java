@@ -8,13 +8,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.don_polesie.back_end.dto.UserDTO;
-import ru.don_polesie.back_end.model.Role;
 import ru.don_polesie.back_end.model.User;
 import ru.don_polesie.back_end.repository.UserRepository;
 import ru.don_polesie.back_end.service.AdminService;
-
-import java.util.Set;
-import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
@@ -97,7 +93,8 @@ public class AdminServiceImpl implements AdminService {
     private UserDTO toDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.id = user.getId().intValue();
-        dto.name = user.getUsername();
+        dto.name = user.getName();
+        dto.surname = user.getSurname();
         dto.email = user.getEmail();
         dto.phoneNumber = user.getPhoneNumber();
         dto.roles = user.getRoles();
@@ -113,7 +110,8 @@ public class AdminServiceImpl implements AdminService {
     private User createUserFromDTO(UserDTO userDTO) {
         String password = userDTO.getPassword();
         return User.builder()
-                .username(userDTO.getName())
+                .name(userDTO.getName())
+                .surname(userDTO.getSurname())
                 .email(userDTO.getEmail())
                 .phoneNumber(userDTO.getPhoneNumber())
                 .password(passwordEncoder.encode(password))

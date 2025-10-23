@@ -3,11 +3,10 @@ package ru.don_polesie.back_end.service;
 import org.springframework.data.domain.Page;
 import ru.don_polesie.back_end.dto.order.OrderDtoRR;
 import ru.don_polesie.back_end.dto.order.ProcessWeightsRequest;
-import ru.don_polesie.back_end.model.Order;
 
 import java.time.Instant;
 
-public interface WorkOrderService {
+public interface WorkerOrderService {
     OrderDtoRR findById(Long id);
 
     Page<OrderDtoRR> findOrdersPage(Integer pageNumber);

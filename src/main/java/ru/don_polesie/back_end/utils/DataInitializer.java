@@ -29,16 +29,17 @@ public class DataInitializer implements CommandLineRunner {
                 .orElseGet(() -> roleRepository.save(new Role("ROLE_USER")));
 
 
-        if (userRepository.findByUsername("admin").isEmpty()) {
+        if (userRepository.findByPhoneNumber("79919916871").isEmpty()) {
             User admin = new User();
-            admin.setUsername("admin");
+            admin.setName("Денис");
+            admin.setSurname("Погосов");
+            admin.setPhoneNumber("79919916871");
             admin.setPassword(passwordEncoder.encode("admin123"));
             admin.getRoles().add(adminRole);
             admin.getRoles().add(workerRole);
             admin.getRoles().add(userRole);
-            admin.setPhoneNumber("79889995000");
             userRepository.save(admin);
-            System.out.println("Admin user created: admin / admin123");
+            System.out.println("Admin user created: 79919916871 / admin123");
         }
     }
 }

@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Getter
 @Entity
-@Table(name = "orders")
+@Table(name = "delivery_order")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

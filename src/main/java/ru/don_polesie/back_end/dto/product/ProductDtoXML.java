@@ -14,6 +14,9 @@ public class ProductDtoXML {
     @XmlElement(name = "Brand")
     private String brand;
 
+    @XmlElement(name = "Category")
+    private String category;
+
     @XmlElement(name = "Name")
     private String name;
 

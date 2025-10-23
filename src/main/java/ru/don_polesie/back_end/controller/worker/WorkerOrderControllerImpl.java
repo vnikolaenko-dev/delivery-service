@@ -1,15 +1,13 @@
-package ru.don_polesie.back_end.controller.impl;
+package ru.don_polesie.back_end.controller.worker;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import ru.don_polesie.back_end.controller.WorkerOrderController;
 import ru.don_polesie.back_end.dto.order.OrderDtoRR;
 import ru.don_polesie.back_end.dto.order.ProcessWeightsRequest;
-import ru.don_polesie.back_end.dto.product.ProductDtoRR;
-import ru.don_polesie.back_end.service.WorkOrderService;
+import ru.don_polesie.back_end.service.WorkerOrderService;
 
 import java.time.Instant;
 
@@ -17,7 +15,7 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class WorkerOrderControllerImpl implements WorkerOrderController {
 
-    private final WorkOrderService workOrderService;
+    private final WorkerOrderService workOrderService;
 
     @Override
     public ResponseEntity<OrderDtoRR> findById(Long id) {

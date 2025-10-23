@@ -1,11 +1,10 @@
-package ru.don_polesie.back_end.controller.impl;
+package ru.don_polesie.back_end.controller.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import ru.don_polesie.back_end.controller.UserOrderController;
 import ru.don_polesie.back_end.dto.order.OrderCreateResponse;
 import ru.don_polesie.back_end.dto.order.OrderDtoRR;
 import ru.don_polesie.back_end.model.User;
@@ -21,18 +20,18 @@ public class UserOrderControllerImpl implements UserOrderController {
 
     @Override
     public ResponseEntity<Page<OrderDtoRR>> findOrdersPage(Integer pageNumber) {
-        String username = securityUtils.getCurrentUsername();
+        String phoneNumber = securityUtils.getCurrentPhoneNumber();
         return ResponseEntity
                 .status(HttpStatus.FOUND)
-                .body(orderServiceImpl.findUserOrdersPage(pageNumber, username));
+                .body(orderServiceImpl.findUserOrdersPage(pageNumber, phoneNumber));
     }
 
     @Override
     public ResponseEntity<Page<OrderDtoRR>> findShippedUserOrdersPage(Integer pageNumber) {
-        String username = securityUtils.getCurrentUsername();
+        String phoneNumber = securityUtils.getCurrentPhoneNumber();
         return ResponseEntity
                 .status(HttpStatus.FOUND)
-                .body(orderServiceImpl.findShippedUserOrdersPage(pageNumber, username));
+                .body(orderServiceImpl.findShippedUserOrdersPage(pageNumber, phoneNumber));
     }
 
     @Override

@@ -15,7 +15,7 @@ import ru.don_polesie.back_end.model.Order;
 import ru.don_polesie.back_end.model.OrderProduct;
 import ru.don_polesie.back_end.repository.OrderProductRepository;
 import ru.don_polesie.back_end.repository.OrderRepository;
-import ru.don_polesie.back_end.service.WorkOrderService;
+import ru.don_polesie.back_end.service.WorkerOrderService;
 import ru.don_polesie.back_end.service.impl.order.PriceService;
 import ru.don_polesie.back_end.service.impl.system.YooKassaServiceImpl;
 
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class WorkOrderServiceImpl implements WorkOrderService {
+public class WorkerOrderServiceImpl implements WorkerOrderService {
     private static final int PAGE_SIZE = 10;
 
     private final OrderRepository orderRepository;

@@ -6,7 +6,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import ru.don_polesie.back_end.model.User;
 import ru.don_polesie.back_end.service.UserService;
-
 @Component
 @RequiredArgsConstructor
 public class SecurityUtils {
@@ -15,11 +14,11 @@ public class SecurityUtils {
 
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        return userService.getByUsername(username);
+        String phoneNumber = authentication.getName();
+        return userService.getByPhoneNumber(phoneNumber);
     }
 
-    public String getCurrentUsername() {
+    public String getCurrentPhoneNumber() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName();
     }

@@ -1,13 +1,10 @@
-package ru.don_polesie.back_end.controller.impl;
+package ru.don_polesie.back_end.controller.admin;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.web.bind.annotation.*;
-import ru.don_polesie.back_end.controller.AdminController;
 import ru.don_polesie.back_end.dto.UserDTO;
 import ru.don_polesie.back_end.service.AdminService;
 

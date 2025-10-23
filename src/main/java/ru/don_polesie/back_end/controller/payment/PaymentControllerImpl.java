@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.controller.impl;
+package ru.don_polesie.back_end.controller.payment;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,10 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import ru.don_polesie.back_end.controller.PaymentController;
 import ru.don_polesie.back_end.dto.payment.CreatePaymentRequest;
 import ru.don_polesie.back_end.service.YooKassaService;
-import ru.don_polesie.back_end.utils.JsonNodeFactoryWrapperImpl;
 
 import java.util.Map;
 

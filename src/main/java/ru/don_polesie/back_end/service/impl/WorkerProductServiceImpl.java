@@ -11,7 +11,8 @@ import ru.don_polesie.back_end.dto.product.ProductDtoRR;
 import ru.don_polesie.back_end.dto.product.ProductDtoSearch;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.mapper.ProductMapper;
-import ru.don_polesie.back_end.model.Product;
+import ru.don_polesie.back_end.model.product.Brand;
+import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.ProductRepository;
 import ru.don_polesie.back_end.service.WorkerProductService;
 
@@ -162,7 +163,7 @@ public class WorkerProductServiceImpl implements WorkerProductService {
      * @param productDtoRR DTO с новыми значениями полей
      */
     private void updateProductFromDto(Product product, ProductDtoRR productDtoRR) {
-        product.setBrand(productDtoRR.getBrand());
+        // product.setBrand(new Brand(productDtoRR.getBrand()));
         product.setName(productDtoRR.getName());
         product.setPrice(productDtoRR.getPrice());
         product.setImageUrl(productDtoRR.getImageUrl());
@@ -170,7 +171,8 @@ public class WorkerProductServiceImpl implements WorkerProductService {
         product.setProteinGrams(productDtoRR.getProteinGrams());
         product.setCarbohydrateGrams(productDtoRR.getCarbohydrateGrams());
         product.setEnergyKcalPer100g(productDtoRR.getEnergyKcalPer100g());
-        product.setVolume(productDtoRR.getVolume());
+        product.setMinWeight(productDtoRR.getMinWeight());
+        product.setMaxWeight(productDtoRR.getMaxWeight());
         product.setStorageTemperatureMin(productDtoRR.getStorageTemperatureMin());
         product.setStorageTemperatureMax(productDtoRR.getStorageTemperatureMax());
         product.setCountryOfOrigin(productDtoRR.getCountryOfOrigin());

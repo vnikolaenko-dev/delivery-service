@@ -2,13 +2,8 @@ package ru.don_polesie.back_end.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "addresses")
 @Getter
 @Setter
 @NoArgsConstructor

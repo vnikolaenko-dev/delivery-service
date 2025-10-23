@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.controller;
+package ru.don_polesie.back_end.controller.user;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.don_polesie.back_end.dto.AddressDTO;
 
 import java.util.List;
-import java.util.Set;
 
 @Tag(
         name = "Адреса доставки",

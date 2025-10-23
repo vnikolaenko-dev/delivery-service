@@ -5,8 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.math.BigDecimal;
+import ru.don_polesie.back_end.model.product.Product;
 
 @Getter
 @Entity

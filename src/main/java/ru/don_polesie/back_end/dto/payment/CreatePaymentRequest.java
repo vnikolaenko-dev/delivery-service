@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class CreatePaymentRequest {
-    private String orderId;
+    private Long orderId;
 }
