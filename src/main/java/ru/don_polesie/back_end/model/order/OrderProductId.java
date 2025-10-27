@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.model;
+package ru.don_polesie.back_end.model.order;
 
 
 import jakarta.persistence.Embeddable;

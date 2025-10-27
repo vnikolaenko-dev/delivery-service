@@ -7,6 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
 import ru.don_polesie.back_end.model.Role;
 import ru.don_polesie.back_end.model.User;
+import ru.don_polesie.back_end.model.basket.Basket;
+import ru.don_polesie.back_end.model.basket.BasketProduct;
+import ru.don_polesie.back_end.repository.BasketRepository;
 import ru.don_polesie.back_end.repository.RoleRepository;
 import ru.don_polesie.back_end.repository.UserRepository;
 import ru.don_polesie.back_end.utils.SmsSenderHttpClient;
@@ -25,6 +28,7 @@ public class UserAuthService {
     private final JWTGeneratorService jwtGeneratorService;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final BasketRepository basketRepository;
 
     /**
      * Отправка временного пароля
@@ -74,6 +78,10 @@ public class UserAuthService {
         user.setRoles(roles);
 
         userRepository.save(user);
+
+        Basket basket = new Basket();
+        basket.setUser(user);
+        basketRepository.save(basket);
     }
 
     private String generate4LetterCode() {

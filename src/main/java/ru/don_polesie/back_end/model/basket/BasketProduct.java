@@ -1,26 +1,28 @@
-package ru.don_polesie.back_end.model;
+package ru.don_polesie.back_end.model.basket;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.don_polesie.back_end.model.order.OrderProductId;
 import ru.don_polesie.back_end.model.product.Product;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "order_products")
+@Table(name = "basket_products")
 @NoArgsConstructor
-public class OrderProduct {
+public class BasketProduct {
     @EmbeddedId
-    private OrderProductId id;
+    private BasketProductId id;
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("orderId")
-    @JoinColumn(name = "order_id")
-    private Order order;
+    @MapsId("basketId")
+    @JoinColumn(name = "basket_id")
+    @JsonIgnore
+    private Basket basket;
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,12 +34,10 @@ public class OrderProduct {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    public OrderProduct(Order order, Product product, Integer quantity) {
-        this.order = order;
+    public BasketProduct(Basket basket, Product product, Integer quantity) {
+        this.basket = basket;
         this.product = product;
         this.quantity = quantity;
-        this.id = new OrderProductId();
+        this.id = new BasketProductId();
     }
-
 }
-

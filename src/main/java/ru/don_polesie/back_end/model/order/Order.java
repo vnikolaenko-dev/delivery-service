@@ -1,9 +1,11 @@
-package ru.don_polesie.back_end.model;
+package ru.don_polesie.back_end.model.order;
 
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import ru.don_polesie.back_end.model.Address;
+import ru.don_polesie.back_end.model.User;
 import ru.don_polesie.back_end.model.enums.OrderStatus;
 
 import java.math.BigDecimal;

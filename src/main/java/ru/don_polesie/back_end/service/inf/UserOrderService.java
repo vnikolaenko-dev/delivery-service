@@ -11,8 +11,6 @@ public interface UserOrderService {
 
     Page<OrderDtoRR> findShippedUserOrdersPage(Integer pageNumber, String username);
 
-    OrderCreateResponse save(OrderDtoRR orderDtoRR, User user);
-
     OrderCreateResponse changeQuantityProductFromOrder(Long orderId, Long productId, int quantity);
 
     OrderCreateResponse deleteProductFromOrder(Long orderId, Long productId);

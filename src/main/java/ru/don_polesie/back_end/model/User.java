@@ -1,8 +1,11 @@
 package ru.don_polesie.back_end.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import ru.don_polesie.back_end.model.basket.Basket;
+import ru.don_polesie.back_end.model.order.Order;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -53,6 +56,9 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @OrderBy("createdAt DESC")
     private List<Order> orders = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Basket basket = new Basket();
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

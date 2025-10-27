@@ -11,8 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.don_polesie.back_end.dto.order.OrderCreateResponse;
 import ru.don_polesie.back_end.dto.order.OrderDtoRR;
+import ru.don_polesie.back_end.model.Address;
 import ru.don_polesie.back_end.model.User;
 import ru.don_polesie.back_end.security.SecurityUtils;
+import ru.don_polesie.back_end.service.impl.UserOrderServiceImpl;
 import ru.don_polesie.back_end.service.inf.UserOrderService;
 
 @RestController
@@ -23,7 +25,7 @@ import ru.don_polesie.back_end.service.inf.UserOrderService;
 )
 @RequestMapping("/api/order")
 public class UserManipulationOrderController {
-    private final UserOrderService orderServiceImpl;
+    private final UserOrderServiceImpl orderServiceImpl;
     private final SecurityUtils securityUtils;
 
     @Operation(
@@ -36,49 +38,11 @@ public class UserManipulationOrderController {
             @ApiResponse(responseCode = "404", description = "Товар или адрес не найден")
     })
     @PostMapping
-    public ResponseEntity<OrderCreateResponse> save(@RequestBody OrderDtoRR orderDtoRR) {
+    public ResponseEntity<OrderCreateResponse> save(@RequestBody Address address) {
         User user = securityUtils.getCurrentUser();
-        var resp = orderServiceImpl.save(orderDtoRR, user);
+        var resp = orderServiceImpl.save(user, address);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(resp);
-    }
-
-    @Operation(
-            summary = "Обновить количество товара в заказу",
-            description = "Обновление заказа"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Заказ успешно создан"),
-            @ApiResponse(responseCode = "400", description = "Неверные данные заказа"),
-            @ApiResponse(responseCode = "404", description = "Товар или адрес не найден")
-    })
-    @GetMapping("/change-quantity")
-    public ResponseEntity<OrderCreateResponse> changeProductQuantity(@RequestParam @Min(value = 1) Long orderId,
-                                                                     @RequestParam @Min(value = 1) Long productId,
-                                                                     @RequestParam @Min(value = 1) int quantity) {
-        var resp = orderServiceImpl.changeQuantityProductFromOrder(orderId, productId, quantity);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(resp);
-    }
-
-    @Operation(
-            summary = "Удалить товар из заказа",
-            description = "Удаляет конкретный товар из заказа (до момента его обработки)"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Товар успешно удален из заказа"),
-            @ApiResponse(responseCode = "400", description = "Неверные параметры запроса"),
-            @ApiResponse(responseCode = "404", description = "Заказ или товар не найден")
-    })
-    // @PreAuthorize("@orderAccess.canModify(#orderId, authentication)")
-    @DeleteMapping("/product")
-    public ResponseEntity<OrderCreateResponse> deleteProductFromOrder(@RequestParam @Min(value = 1) Long orderId,
-                                                                      @RequestParam @Min(value = 1) Long productId) {
-        var resp = orderServiceImpl.deleteProductFromOrder(orderId, productId);
-        return ResponseEntity
-                .status(HttpStatus.OK)
                 .body(resp);
     }
 }

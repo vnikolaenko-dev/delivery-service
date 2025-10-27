@@ -5,8 +5,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import ru.don_polesie.back_end.dto.order.OrderDtoRR;
 import ru.don_polesie.back_end.dto.order.OrderItemDto;
-import ru.don_polesie.back_end.model.Order;
-import ru.don_polesie.back_end.model.OrderProduct;
+import ru.don_polesie.back_end.model.order.Order;
+import ru.don_polesie.back_end.model.order.OrderProduct;
 
 import java.util.List;
 import java.util.Set;

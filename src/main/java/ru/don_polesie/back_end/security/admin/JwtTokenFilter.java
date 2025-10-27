@@ -21,7 +21,16 @@ public class JwtTokenFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest servletRequest,
                          ServletResponse servletResponse,
-                         FilterChain filterChain) {
+                         FilterChain filterChain) throws ServletException, IOException {
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        String path = request.getRequestURI();
+
+        // Пропускаем публичные пути
+        if (path.startsWith("/auth/") || request.getMethod().equals("OPTIONS")) {
+            filterChain.doFilter(servletRequest, servletResponse);
+            return;
+        }
+
         var bearerToken = ((HttpServletRequest) servletRequest).getHeader("Authorization");
 
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {

@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.don_polesie.back_end.model.enums.OrderStatus;
-import ru.don_polesie.back_end.model.Order;
+import ru.don_polesie.back_end.model.order.Order;
 
 import java.time.Instant;
 import java.util.List;

@@ -12,11 +12,16 @@ import ru.don_polesie.back_end.dto.AddressDTO;
 import ru.don_polesie.back_end.dto.order.OrderCreateResponse;
 import ru.don_polesie.back_end.dto.order.OrderDtoRR;
 import ru.don_polesie.back_end.dto.order.OrderItemDto;
+import ru.don_polesie.back_end.model.basket.Basket;
+import ru.don_polesie.back_end.model.basket.BasketProduct;
 import ru.don_polesie.back_end.model.enums.OrderStatus;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.mapper.AddressMapper;
 import ru.don_polesie.back_end.mapper.OrderMapper;
 import ru.don_polesie.back_end.model.*;
+import ru.don_polesie.back_end.model.order.Order;
+import ru.don_polesie.back_end.model.order.OrderProduct;
+import ru.don_polesie.back_end.model.order.OrderProductId;
 import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.*;
 import ru.don_polesie.back_end.service.inf.UserOrderService;
@@ -24,8 +29,11 @@ import ru.don_polesie.back_end.service.inf.YooKassaService;
 import ru.don_polesie.back_end.service.impl.order.PriceService;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -43,6 +51,7 @@ public class UserOrderServiceImpl implements UserOrderService {
     private final AddressMapper addressMapper;
     private final YooKassaService yooKassaServiceImpl;
     private final PriceService priceService;
+    private final BasketRepository basketRepository;
 
     /**
      * Находит заказ по идентификатору
@@ -98,28 +107,66 @@ public class UserOrderServiceImpl implements UserOrderService {
         orderRepository.deleteById(orderId);
     }
 
+
     /**
-     * Создает новый заказ и платеж
+     * Создает новый заказ и платеж на основе корзины пользователя
      *
-     * @param orderDtoRR DTO с данными заказа
      * @param user пользователь, создающий заказ
      * @return ответ с созданным заказом и данными платежа
      * @throws RuntimeException если не удалось создать платеж
      */
-    @Override
     @Transactional
-    public OrderCreateResponse save(OrderDtoRR orderDtoRR, User user) {
-        log.info("Saving order: {}", orderDtoRR);
-        Address address = processAddress(orderDtoRR.getAddress());
-        Order order = createOrder(orderDtoRR, user, address);
+    public OrderCreateResponse save(User user, Address address) {
+        log.info("Saving order for user: {}", user.getPhoneNumber());
 
+        // Получаем корзину пользователя
+        Basket basket = basketRepository.findByUser_PhoneNumber(user.getPhoneNumber())
+                .orElseThrow(() -> new ObjectNotFoundException("Basket not found for user: " + user.getPhoneNumber()));
+
+        if (basket.getBasketProducts().isEmpty()) {
+            throw new RuntimeException("Basket is empty. Cannot create order.");
+        }
+
+        // Создаем заказ
+        Order order = new Order();
+        order.setUser(user);
+        order.setAddress(address);
+        order.setStatus(OrderStatus.NEW);
+
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        // Переносим все товары из корзины в заказ
+        Set<OrderProduct> orderProducts = new HashSet<>();
+        for (BasketProduct basketProduct : basket.getBasketProducts()) {
+            Product product = basketProduct.getProduct();
+            int quantity = basketProduct.getQuantity();
+
+            BigDecimal itemCost = priceService.calculateProductCost(product, quantity);
+            totalAmount = totalAmount.add(itemCost);
+
+            OrderProduct orderProduct = new OrderProduct();
+            orderProduct.setOrder(order);
+            orderProduct.setProduct(product);
+            orderProduct.setQuantity(quantity);
+
+            orderProducts.add(orderProduct);
+        }
+
+        order.setTotalAmount(totalAmount);
+
+        // Сохраняем заказ
         Order savedOrder = orderRepository.save(order);
+        log.info("Order {} created with total amount {}", savedOrder.getId(), totalAmount);
 
-        processOrderItems(orderDtoRR, savedOrder);
-        orderRepository.save(order);
+        // Очищаем корзину после оформления заказа
+        basket.getBasketProducts().clear();
+        basket.setTotalAmount(BigDecimal.ZERO);
+        basketRepository.save(basket);
 
-        return createPaymentResponse(order);
+        // Создаем платеж
+        return createPaymentResponse(savedOrder);
     }
+
 
     @Override
     @Transactional
