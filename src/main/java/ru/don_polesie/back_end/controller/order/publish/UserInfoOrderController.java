@@ -1,0 +1,67 @@
+package ru.don_polesie.back_end.controller.order.publish;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Min;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import ru.don_polesie.back_end.dto.order.OrderDtoRR;
+import ru.don_polesie.back_end.security.SecurityUtils;
+import ru.don_polesie.back_end.service.inf.UserOrderService;
+
+
+@RestController
+@RequiredArgsConstructor
+@Tag(
+        name = "Заказы пользователя",
+        description = "API получения информации о заказах текущего пользователя"
+)
+@RequestMapping("/api/order")
+public class UserInfoOrderController {
+    private final UserOrderService orderServiceImpl;
+    private final SecurityUtils securityUtils;
+
+    @Operation(
+            summary = "Все заказы",
+            description = "Возвращает все заказы пользователя"
+    )
+    @GetMapping("")
+    public ResponseEntity<Page<OrderDtoRR>> findOrdersPage(@RequestParam @Min(value = 1) Integer pageNumber) {
+        String phoneNumber = securityUtils.getCurrentPhoneNumber();
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .body(orderServiceImpl.findUserOrdersPage(pageNumber, phoneNumber));
+    }
+
+    @Operation(
+            summary = "История доставленных заказов",
+            description = "Возвращает историю заказов текущего пользователя с пагинацией"
+    )
+    @GetMapping("/shipped")
+    public ResponseEntity<Page<OrderDtoRR>> findShippedUserOrdersPage(@RequestParam @Min(value = 1) Integer pageNumber) {
+        String phoneNumber = securityUtils.getCurrentPhoneNumber();
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .body(orderServiceImpl.findShippedUserOrdersPage(pageNumber, phoneNumber));
+    }
+
+    @Operation(
+            summary = "Получить детали заказа",
+            description = "Возвращает полную информацию о конкретном заказе пользователя"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Заказ найден"),
+            @ApiResponse(responseCode = "404", description = "Заказ не найден или недоступен")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<OrderDtoRR> findById(@PathVariable @Min(value = 1) Long id) {
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .body(orderServiceImpl.findById(id));
+    }
+}

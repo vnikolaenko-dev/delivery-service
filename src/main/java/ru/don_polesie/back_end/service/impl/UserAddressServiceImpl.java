@@ -7,7 +7,7 @@ import ru.don_polesie.back_end.mapper.AddressMapper;
 import ru.don_polesie.back_end.model.Address;
 import ru.don_polesie.back_end.model.User;
 import ru.don_polesie.back_end.repository.AddressRepository;
-import ru.don_polesie.back_end.service.UserAddressService;
+import ru.don_polesie.back_end.service.inf.UserAddressService;
 
 import java.util.List;
 

@@ -15,7 +15,7 @@ import ru.don_polesie.back_end.model.Order;
 import ru.don_polesie.back_end.model.OrderProduct;
 import ru.don_polesie.back_end.repository.OrderProductRepository;
 import ru.don_polesie.back_end.repository.OrderRepository;
-import ru.don_polesie.back_end.service.WorkerOrderService;
+import ru.don_polesie.back_end.service.inf.WorkerOrderService;
 import ru.don_polesie.back_end.service.impl.order.PriceService;
 import ru.don_polesie.back_end.service.impl.system.YooKassaServiceImpl;
 

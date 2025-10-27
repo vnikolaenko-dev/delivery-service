@@ -11,7 +11,7 @@ import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.model.Order;
 import ru.don_polesie.back_end.model.OrderProduct;
 import ru.don_polesie.back_end.repository.OrderRepository;
-import ru.don_polesie.back_end.service.YooKassaService;
+import ru.don_polesie.back_end.service.inf.YooKassaService;
 import ru.don_polesie.back_end.utils.CidrUtils;
 
 

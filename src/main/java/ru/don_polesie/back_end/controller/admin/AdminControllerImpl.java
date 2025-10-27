@@ -1,20 +1,31 @@
 package ru.don_polesie.back_end.controller.admin;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.don_polesie.back_end.dto.UserDTO;
-import ru.don_polesie.back_end.service.AdminService;
+import ru.don_polesie.back_end.service.inf.AdminService;
 
 @RestController
 @RequiredArgsConstructor
-public class AdminControllerImpl implements AdminController {
+@Tag(
+        name = "Администрирование",
+        description = "API для управления пользователями и административных функций"
+)
+@RequestMapping("/api/admin")
+public class AdminControllerImpl {
 
     private final AdminService adminService;
 
-    @Override
+    @Operation(
+            summary = "Получить список пользователей",
+            description = "Возвращает постраничный список всех зарегистрированных пользователей системы"
+    )
+    @GetMapping("/users")
     public ResponseEntity<Page<UserDTO>> findUsersPage(@RequestParam Integer pageNumber) {
         Page<UserDTO> usersPage = adminService.findUsersPage(pageNumber);
         return ResponseEntity
@@ -22,7 +33,11 @@ public class AdminControllerImpl implements AdminController {
                 .body(usersPage);
     }
 
-    @Override
+    @Operation(
+            summary = "Получить список работников",
+            description = "Возвращает постраничный список всех сотрудников с правами работника"
+    )
+    @GetMapping("/workers")
     public ResponseEntity<Page<UserDTO>> findWorkersPage(@RequestParam Integer pageNumber) {
         Page<UserDTO> workersPage = adminService.findWorkersPage(pageNumber);
         return ResponseEntity
@@ -30,7 +45,11 @@ public class AdminControllerImpl implements AdminController {
                 .body(workersPage);
     }
 
-    @Override
+    @Operation(
+            summary = "Создать пользователя",
+            description = "Создает пользователя с заданными ролями"
+    )
+    @PostMapping("/user/create")
     public ResponseEntity<Void> createUser(@RequestBody UserDTO userDTO) {
         adminService.createUser(userDTO);
         return ResponseEntity
@@ -38,7 +57,11 @@ public class AdminControllerImpl implements AdminController {
                 .build();
     }
 
-    @Override
+    @Operation(
+            summary = "Удалить пользователя",
+            description = "Полностью удаляет пользователя из системы по его идентификатору"
+    )
+    @DeleteMapping("/user/delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         adminService.deleteUser(id);
         return ResponseEntity

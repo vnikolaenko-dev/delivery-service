@@ -1,0 +1,72 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: delivery-db
+    environment:
+      POSTGRES_DB: delivery
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./import:/data/import
+    networks:
+      - delivery-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d den"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: delivery-app
+    environment:
+      # Database
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/delivery
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 123
+
+      # Server
+      SERVER_PORT: 8080
+
+      # JWT Security
+      SECURITY_JWT_SECRET: your-very-secure-secret-key-with-at-least-32-characters
+      SECURITY_JWT_ACCESS: 3600000
+      SECURITY_JWT_REFRESH: 2592000000
+      SECURITY_JWT_ISSUER: delivery-admin
+
+      # YooKassa
+      YOOKASSA_SHOP_ID: 1135993
+      YOOKASSA_SECRET_KEY: test_bZX-_VfdaX0Rr3EPRdubMCzq5hJVdNpZ6e4ZvaVaAgM
+
+      # Import directory
+      IMPORT_DIRECTORY: /data/import
+
+      # Spring профиль (опционально)
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+      - ./import:/data/import
+    networks:
+      - delivery-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+  import:
+
+networks:
+  delivery-network:
+    driver: bridge

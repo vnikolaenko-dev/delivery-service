@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import ru.don_polesie.back_end.dto.UserDTO;
 import ru.don_polesie.back_end.model.User;
 import ru.don_polesie.back_end.repository.UserRepository;
-import ru.don_polesie.back_end.service.AdminService;
+import ru.don_polesie.back_end.service.inf.AdminService;
 
 @Service
 @RequiredArgsConstructor

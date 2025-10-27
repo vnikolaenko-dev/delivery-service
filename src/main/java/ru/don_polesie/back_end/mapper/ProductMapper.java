@@ -60,7 +60,7 @@ public interface ProductMapper {
         if (categoryName == null || categoryName.isEmpty()) {
             return null;
         }
-        Category category = new Category();
+        Category category = new Category(categoryName);
         category.setName(categoryName);
         return category;
     }

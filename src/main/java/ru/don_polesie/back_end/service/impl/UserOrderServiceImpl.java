@@ -1,6 +1,7 @@
 package ru.don_polesie.back_end.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,12 +19,15 @@ import ru.don_polesie.back_end.mapper.OrderMapper;
 import ru.don_polesie.back_end.model.*;
 import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.*;
-import ru.don_polesie.back_end.service.UserOrderService;
-import ru.don_polesie.back_end.service.YooKassaService;
+import ru.don_polesie.back_end.service.inf.UserOrderService;
+import ru.don_polesie.back_end.service.inf.YooKassaService;
 import ru.don_polesie.back_end.service.impl.order.PriceService;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -58,7 +62,7 @@ public class UserOrderServiceImpl implements UserOrderService {
      * Получает страницу заказов пользователя
      *
      * @param pageNumber номер страницы
-     * @param username имя пользователя
+     * @param phoneNumber номер пользователя
      * @return страница с заказами
      */
     @Override
@@ -72,7 +76,7 @@ public class UserOrderServiceImpl implements UserOrderService {
      * Получает страницу доставленных заказов пользователя
      *
      * @param pageNumber номер страницы
-     * @param username имя пользователя
+     * @param phoneNumber номер пользователя
      * @return страница с доставленными заказами
      */
     @Override
@@ -90,6 +94,7 @@ public class UserOrderServiceImpl implements UserOrderService {
     @Override
     @Transactional
     public void deleteOrder(Long orderId) {
+        log.info("Deleting order with id: {}", orderId);
         orderRepository.deleteById(orderId);
     }
 
@@ -104,10 +109,36 @@ public class UserOrderServiceImpl implements UserOrderService {
     @Override
     @Transactional
     public OrderCreateResponse save(OrderDtoRR orderDtoRR, User user) {
+        log.info("Saving order: {}", orderDtoRR);
         Address address = processAddress(orderDtoRR.getAddress());
         Order order = createOrder(orderDtoRR, user, address);
-        processOrderItems(orderDtoRR, order);
 
+        Order savedOrder = orderRepository.save(order);
+
+        processOrderItems(orderDtoRR, savedOrder);
+        orderRepository.save(order);
+
+        return createPaymentResponse(order);
+    }
+
+    @Override
+    @Transactional
+    public OrderCreateResponse changeQuantityProductFromOrder(Long orderId, Long productId, int quantity) {
+        Order order = getOrderById(orderId);
+        if (order.getStatus() != OrderStatus.PAYING) {
+            throw new RuntimeException("Невозможно редактировать заказ.");
+        }
+        Product product = getProductById(productId);
+        OrderProduct orderProduct = getOrderProduct(orderId, productId);
+        orderProduct.setQuantity(quantity);
+
+        log.info("Changing quantity product {} from order {}", product, order);
+        BigDecimal productPrice = priceService.calculateProductCost(product, quantity);
+        order.setTotalAmount(order.getTotalAmount().subtract(order.getTotalAmount().subtract(productPrice)));
+        order.removeProduct(orderProduct);
+        order.addProduct(orderProduct);
+        log.info("New order price is {}", order.getTotalAmount());
+        orderRepository.save(order);
         return createPaymentResponse(order);
     }
 
@@ -120,20 +151,25 @@ public class UserOrderServiceImpl implements UserOrderService {
      */
     @Override
     @Transactional
-    public void deleteProductFromOrder(Long orderId, Long productId) {
+    public OrderCreateResponse deleteProductFromOrder(Long orderId, Long productId) {
         Order order = getOrderById(orderId);
+        if (order.getStatus() != OrderStatus.NEW) {
+            throw new RuntimeException("Невозможно редактировать заказ.");
+        }
         Product product = getProductById(productId);
         OrderProduct orderProduct = getOrderProduct(orderId, productId);
 
+        log.info("Deleting product {} from order {}", product, order);
         BigDecimal productPrice = priceService.calculateProductCost(product, orderProduct.getQuantity());
-
         order.setTotalAmount(order.getTotalAmount().subtract(productPrice));
         order.removeProduct(orderProduct);
+        log.info("New order price is {}", order.getTotalAmount());
         orderRepository.save(order);
+        return createPaymentResponse(order);
     }
 
-    // ========== ПРИВАТНЫЕ ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========
 
+    // ========== ПРИВАТНЫЕ ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========
     /**
      * Создает объект пагинации
      */
@@ -169,26 +205,47 @@ public class UserOrderServiceImpl implements UserOrderService {
         order.setAddress(address);
         order.setStatus(OrderStatus.NEW);
         order.setTotalAmount(BigDecimal.ZERO);
-        return orderRepository.save(order);
+        return order;
     }
 
     /**
      * Обрабатывает товары в заказе и рассчитывает общую стоимость
      */
     private void processOrderItems(OrderDtoRR orderDtoRR, Order order) {
-        BigDecimal totalAmount = orderDtoRR.getItems().stream()
-                .map(orderItem -> {
-                    Product product = productRepository.findById(orderItem.getProductId()).get(); // предположим, что есть метод getProduct()
-                    int quantity = orderItem.getQuantity();   // предположим, что есть метод getQuantity()
-                    return priceService.calculateProductCost(product, orderItem.getQuantity());
-                })
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        List<OrderProduct> orderProducts = new ArrayList<>();
 
+        for (OrderItemDto itemDto : orderDtoRR.getItems()) {
+            Product product = productRepository.findById(itemDto.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Product not found: " + itemDto.getProductId()));
+
+            // Создаем связь OrderProduct
+            OrderProduct orderProduct = new OrderProduct();
+
+            // Убедитесь, что OrderProductId создается правильно
+            OrderProductId orderProductId = new OrderProductId();
+            orderProductId.setOrderId(order.getId()); // Теперь order.getId() не null
+            orderProductId.setProductId(product.getId());
+            orderProduct.setId(orderProductId);
+
+            orderProduct.setOrder(order);
+            orderProduct.setProduct(product);
+            orderProduct.setQuantity(itemDto.getQuantity());
+
+            orderProducts.add(orderProduct);
+
+            // Рассчитываем стоимость
+            BigDecimal itemCost = priceService.calculateProductCost(product, itemDto.getQuantity());
+            totalAmount = totalAmount.add(itemCost);
+        }
+
+        // Сохраняем все OrderProducts
+        orderProductRepository.saveAll(orderProducts);
+
+        // Устанавливаем связи и обновляем сумму
         order.setTotalAmount(totalAmount);
         order.setStatus(OrderStatus.PAYING);
-        orderRepository.save(order);
     }
-
     /**
      * Обрабатывает один товар в заказе
      */

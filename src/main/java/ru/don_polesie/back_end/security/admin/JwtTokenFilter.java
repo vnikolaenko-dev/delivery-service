@@ -31,7 +31,6 @@ public class JwtTokenFilter extends GenericFilterBean {
         if (bearerToken != null && jwtTokenProvider.validateToken(bearerToken)) {
             try {
                 var authentication = jwtTokenProvider.getAuthentication(bearerToken);
-
                 if (authentication != null) {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }

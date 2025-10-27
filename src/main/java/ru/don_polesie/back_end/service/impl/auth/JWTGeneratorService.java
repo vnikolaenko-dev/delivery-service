@@ -1,6 +1,7 @@
 package ru.don_polesie.back_end.service.impl.auth;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import ru.don_polesie.back_end.service.impl.StaffServiceImpl;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class JWTGeneratorService {
     private final AuthenticationManager authenticationManager;
     private final StaffServiceImpl userServiceImpl;
@@ -17,8 +19,9 @@ public class JWTGeneratorService {
 
 
     public JwtAuthResponse generateJWT(String number, String password) {
-        var jwtResponse = new JwtAuthResponse();
+        log.info("JWT is generating for user: {}", number);
 
+        var jwtResponse = new JwtAuthResponse();
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         number, password)
@@ -37,6 +40,7 @@ public class JWTGeneratorService {
         jwtResponse.setRefreshToken(jwtTokenProvider.createRefreshToken(
                 user.getId(), number)
         );
+        log.info("JWT generated for user: {}", number);
         return jwtResponse;
     }
 }

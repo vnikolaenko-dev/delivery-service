@@ -13,6 +13,7 @@ import ru.don_polesie.back_end.utils.SmsSenderHttpClient;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,12 +42,15 @@ public class UserAuthService {
         CodeEntry entry = codes.get(number);
         if (entry != null && entry.code.equals(code) && System.currentTimeMillis() < entry.expireAt) {
             // Если номера нет в бд - сохраняем нового пользователя
-            if (userRepository.findByPhoneNumber(number).isEmpty()) {
-                System.out.println("SAVE USER");
+            Optional<User> userOptional = userRepository.findByPhoneNumber(number);
+            if (userOptional.isEmpty()) {
                 save(number, code);
+            } else {
+                User user = userOptional.get();
+                user.setPassword(passwordEncoder.encode(entry.code));
+                userRepository.save(user);
             }
-            System.out.println(number + " " + code);
-            // codes.remove(number);
+            codes.remove(number);
             return jwtGeneratorService.generateJWT(number, code); // пример, подставь свою реализацию
         }
         // codes.entrySet().removeIf(e -> System.currentTimeMillis() > e.getValue().expireAt);
@@ -68,7 +72,6 @@ public class UserAuthService {
         HashSet<Role> roles = new HashSet<>();
         roles.add(roleRepository.findByName("ROLE_USER").get());
         user.setRoles(roles);
-
 
         userRepository.save(user);
     }

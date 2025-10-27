@@ -1,0 +1,49 @@
+package ru.don_polesie.back_end.controller.order.staff;
+
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import ru.don_polesie.back_end.dto.order.ProcessWeightsRequest;
+import ru.don_polesie.back_end.service.inf.WorkerOrderService;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/staff/order")
+public class OrderProcessController {
+
+    private final WorkerOrderService workOrderService;
+
+    @Operation(
+            summary = "Обработать заказ",
+            description = "Обновление весов и статуса заказа в процессе сборки"
+    )
+    @PostMapping("/{id}/process")
+    public ResponseEntity<Void> process(@PathVariable @Min(value = 1) Long id,
+                                        @RequestBody @Valid ProcessWeightsRequest req) {
+        workOrderService.processOrder(id, req);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Удалить заказ",
+            description = "Полное удаление заказа из системы (административная функция)"
+    )
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable @Min(value = 1) Long id) {
+        // workOrderService.deleteOrder(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Отметить как отправленный",
+            description = "Изменение статуса заказа на 'отправлен' после комплектации"
+    )
+    @PutMapping("/ship/{id}")
+    public ResponseEntity<Void> markShipped(@PathVariable @Min(value = 1)Long id) {
+        workOrderService.markShipped(id);
+        return ResponseEntity.ok().build();
+    }
+}

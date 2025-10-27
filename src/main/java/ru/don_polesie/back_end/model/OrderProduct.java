@@ -8,6 +8,7 @@ import lombok.Setter;
 import ru.don_polesie.back_end.model.product.Product;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "order_products")
 @NoArgsConstructor
@@ -37,5 +38,6 @@ public class OrderProduct {
         this.quantity = quantity;
         this.id = new OrderProductId();
     }
+
 }
 

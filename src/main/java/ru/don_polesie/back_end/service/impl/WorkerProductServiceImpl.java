@@ -11,10 +11,11 @@ import ru.don_polesie.back_end.dto.product.ProductDtoRR;
 import ru.don_polesie.back_end.dto.product.ProductDtoSearch;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.mapper.ProductMapper;
-import ru.don_polesie.back_end.model.product.Brand;
 import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.ProductRepository;
-import ru.don_polesie.back_end.service.WorkerProductService;
+import ru.don_polesie.back_end.service.inf.WorkerProductService;
+import ru.don_polesie.back_end.service.inf.product.BrandService;
+import ru.don_polesie.back_end.service.inf.product.CategoryService;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,6 +26,8 @@ public class WorkerProductServiceImpl implements WorkerProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final CategoryService categoryService;
+    private final BrandService brandService;
 
     /**
      * Получает страницу с товарами, имеющими ненулевое количество
@@ -98,6 +101,7 @@ public class WorkerProductServiceImpl implements WorkerProductService {
     @Transactional
     public ProductDtoRR update(ProductDtoRR productDtoRR, Long id) {
         Product existingProduct = getProductById(id);
+        checkBrandAndCategory(existingProduct);
         updateProductFromDto(existingProduct, productDtoRR);
         Product savedProduct = productRepository.save(existingProduct);
         return productMapper.toProductDtoRR(savedProduct);
@@ -128,11 +132,24 @@ public class WorkerProductServiceImpl implements WorkerProductService {
     @Transactional
     public ProductDtoRR save(ProductDtoRR productDtoRR) {
         Product newProduct = productMapper.productDtoRRtoProduct(productDtoRR);
+        checkBrandAndCategory(newProduct);
         Product savedProduct = productRepository.save(newProduct);
         return productMapper.toProductDtoRR(savedProduct);
     }
 
     // ========== ПРИВАТНЫЕ ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========
+
+    private void checkBrandAndCategory(Product product) {
+        String brandName = product.getBrand().getName();
+        String categoryName = product.getCategory().getName();
+        product.setBrand(brandService.findByName(brandName));
+        product.setCategory(categoryService.findByName(categoryName));
+        if (product.getBrand() == null) {
+            throw new ObjectNotFoundException("Brand not found with name: " + brandName);
+        } else if (product.getCategory() == null) {
+            throw new ObjectNotFoundException("Category not found with name: " + categoryName);
+        }
+    }
 
     /**
      * Создает объект пагинации с настройками по умолчанию

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
 import ru.don_polesie.back_end.exceptions.AccessDeniedException;
 import ru.don_polesie.back_end.model.Role;
-import ru.don_polesie.back_end.service.UserService;
+import ru.don_polesie.back_end.service.inf.UserService;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
@@ -37,12 +37,12 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
     }
 
-    public String createAccessToken(Long userId, String username, Set<Role> roles) {
+    public String createAccessToken(Long userId, String phoneNumber, Set<Role> roles) {
         var now = new Date();
         var exp = new Date(now.getTime() + jwtProperties.getAccess());
 
         var claims = Jwts.claims()
-                .subject(username)
+                .subject(phoneNumber)
                 .issuer(jwtProperties.getIssuer())
                 .add("id", userId)
                 .add("roles", resolveRoles(roles))
@@ -57,12 +57,12 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String createRefreshToken(Long userId, String username) {
+    public String createRefreshToken(Long userId, String phoneNumber) {
         var now = new Date();
         var exp = new Date(now.getTime() + jwtProperties.getRefresh());
 
         var claims = Jwts.claims()
-                .subject(username)
+                .subject(phoneNumber)
                 .issuer(jwtProperties.getIssuer())
                 .add("id", userId)
                 .add("typ", "refresh")

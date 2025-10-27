@@ -15,13 +15,12 @@ import ru.don_polesie.back_end.mapper.ProductMapper;
 import ru.don_polesie.back_end.model.product.Brand;
 import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.ProductRepository;
-import ru.don_polesie.back_end.service.ProductImportService;
+import ru.don_polesie.back_end.service.inf.product.ProductImportService;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Optional;
 
 @Service

@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/den}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/delivery}
     username: ${SPRING_DATASOURCE_USERNAME:root}
     password: ${SPRING_DATASOURCE_PASSWORD:123}
   jpa:
@@ -24,12 +24,16 @@ springdoc:
   packages-to-scan: ru.don_polesie.back_end.controller
 
 
-
-
 logging:
   level:
     org.springframework: INFO
     com.example.demo: DEBUG
+    org.hibernate: WARN
+  file:
+    name: logs/application.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
 
 server:
@@ -40,17 +44,10 @@ security:
     secret: ${SECURITY_JWT_SECRET:your-very-secure-secret-key-with-at-least-32-characters}
     access: ${SECURITY_JWT_ACCESS:3600000}
     refresh: ${SECURITY_JWT_REFRESH:2592000000}
-    issuer: ${SECURITY_JWT_ISSUER:don-polesie-admin}
-  guest:
-    secret: ${SECURITY_GUEST_SECRET:your-very-secure-secret-key-with-at-least-32-characters}
-    ttl: ${SECURITY_GUEST_TTL:2592000000}
-    issuer: ${SECURITY_GUEST_ISSUER:don-polesie-api}
+    issuer: ${SECURITY_JWT_ISSUER:delivery-admin}
   YooKassa:
     shopId: ${YOOKASSA_SHOP_ID:1135993}
     secretKey: ${YOOKASSA_SECRET_KEY:test_bZX-_VfdaX0Rr3EPRdubMCzq5hJVdNpZ6e4ZvaVaAgM}
-  MtsExolve:
-    token: ${MTS_TOKEN:}
-    number: ${}
 
 import:
   directory: ${IMPORT_DIRECTORY:/data/import}

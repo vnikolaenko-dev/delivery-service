@@ -1,12 +1,13 @@
 package ru.don_polesie.back_end.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.model.User;
 import ru.don_polesie.back_end.repository.UserRepository;
-import ru.don_polesie.back_end.service.UserService;
+import ru.don_polesie.back_end.service.inf.UserService;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +27,11 @@ public class StaffServiceImpl implements UserService {
     public User getByPhoneNumber(String phoneNumber) {
         return userRepository
                 .findByPhoneNumber(phoneNumber)
-                .orElseThrow(() -> new ObjectNotFoundException(""));
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        "Пользователь с номером телефона " + phoneNumber + " не найден"
+                ));
     }
+
 
     /**
      * Находит пользователя по идентификатору

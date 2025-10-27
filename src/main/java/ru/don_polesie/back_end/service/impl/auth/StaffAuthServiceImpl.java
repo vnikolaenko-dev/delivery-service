@@ -1,15 +1,12 @@
 package ru.don_polesie.back_end.service.impl.auth;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.don_polesie.back_end.dto.auth.JwtAuthRequest;
 import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
 import ru.don_polesie.back_end.security.admin.JwtTokenProvider;
-import ru.don_polesie.back_end.service.AuthService;
+import ru.don_polesie.back_end.service.inf.AuthService;
 
 
 @Service

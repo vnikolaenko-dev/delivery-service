@@ -13,7 +13,7 @@ import java.util.Collection;
 public class JwtEntity implements UserDetails {
 
     private Long id;
-    private String username;
+    private String phoneNumber;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
 
@@ -29,7 +29,7 @@ public class JwtEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return phoneNumber;
     }
 
     @Override

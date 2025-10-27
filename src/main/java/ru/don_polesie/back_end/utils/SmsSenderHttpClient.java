@@ -1,19 +1,16 @@
 package ru.don_polesie.back_end.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
+import lombok.extern.slf4j.Slf4j;
 
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.Map;
 
+@Slf4j
 public class SmsSenderHttpClient {
     private static final Dotenv dotenv = Dotenv.load();
-    private static String token = dotenv.get("MTS_EXOLVE_API_TOKEN");
-    private static String senderNumber = dotenv.get("MTS_NUMBER");
+    private static final String token = dotenv.get("MTS_EXOLVE_API_TOKEN");
+    private static final String senderNumber = dotenv.get("MTS_NUMBER");
 
 
     public static void sendSms(String recipientNumber, String text) {
@@ -42,42 +39,27 @@ public class SmsSenderHttpClient {
 
             String authHeader = "Bearer " + token;
 
-            System.out.println("JSON Body:\n" + jsonBody);
+            log.info("SMS request sending - PhoneNumber: {}, Text: {}",
+                    recipientNumber, text);
 
+            /*
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.exolve.ru/messaging/v1/SendSMS"))
                     .header("Authorization", authHeader)
                     .header("Content-Type", "application/json")
                     .header("Accept", "application/json")
-                    .header("Origin", "https://dev.exolve.ru")
-                    .header("User-Agent", "Mozilla/5.0 (Linux; Android) AppleWebKit/537.36")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();
 
-            // Вывод отладочной информации ДО отправки запроса
-            System.out.println("=== Debug Information ===");
-            System.out.println("URL: " + request.uri());
-            System.out.println("Method: POST");
-            System.out.println("Headers: " + request.headers().map());
-            System.out.println("Body: " + jsonBody);
-            System.out.println("=========================");
-
-            /*
-            чтобы не тратить деньги
-
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-
-            System.out.println("Status Code: " + response.statusCode());
-            System.out.println("Response: " + response.body());
+            log.info("SMS response body - Body: {}",
+                    response.body());
 
             if (response.statusCode() != 200) {
                 throw new RuntimeException("API returned error: " + response.body());
             }
-
-            */
-
-
+             */
         } catch (Exception e) {
             throw new RuntimeException("Failed to send SMS", e);
         }
