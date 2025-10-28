@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
 import ru.don_polesie.back_end.exceptions.AccessDeniedException;
 import ru.don_polesie.back_end.model.Role;
-import ru.don_polesie.back_end.service.inf.UserService;
+import ru.don_polesie.back_end.service.staffOnly.StaffService;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
@@ -29,7 +29,7 @@ public class JwtTokenProvider {
 
     private final JwtProperties jwtProperties;
     private final UserDetailsService jwtUserDetailsService;
-    private final UserService userServiceImpl;
+    private final StaffService userServiceImpl;
     private Key key;
 
     @PostConstruct

@@ -12,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 public class ProcessWeightsRequest {
 
-    @NotEmpty(message = "Список весов не должен быть пустым")
     private List<WeightDto> weights;
 
     @Data

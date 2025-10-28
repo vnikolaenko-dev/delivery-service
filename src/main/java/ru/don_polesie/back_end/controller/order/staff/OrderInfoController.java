@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.don_polesie.back_end.dto.order.OrderDtoRR;
 import ru.don_polesie.back_end.model.enums.OrderStatus;
-import ru.don_polesie.back_end.service.inf.WorkerOrderService;
+import ru.don_polesie.back_end.service.order.WorkerOrderService;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,13 +40,13 @@ public class OrderInfoController {
     }
 
     @Operation(
-            summary = "Список заказов для обработки",
-            description = "Возвращает страницу заказов, требующих обработки сотрудниками"
+            summary = "Список заказов по статусу",
+            description = "Возвращает страницу заказов с определенным статусом"
     )
     @GetMapping("/status")
     public ResponseEntity<Page<OrderDtoRR>> findByStatus(@RequestParam Integer pageNumber, @RequestParam String status) {
         OrderStatus orderStatus = OrderStatus.valueOf(status);
-        Page<OrderDtoRR> ordersPage = null;
+        Page<OrderDtoRR> ordersPage = workOrderService.findOrdersPageWithStatus(pageNumber, orderStatus);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(ordersPage);

@@ -10,12 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.don_polesie.back_end.dto.order.OrderCreateResponse;
-import ru.don_polesie.back_end.dto.order.OrderDtoRR;
 import ru.don_polesie.back_end.model.Address;
 import ru.don_polesie.back_end.model.User;
 import ru.don_polesie.back_end.security.SecurityUtils;
-import ru.don_polesie.back_end.service.impl.UserOrderServiceImpl;
-import ru.don_polesie.back_end.service.inf.UserOrderService;
+import ru.don_polesie.back_end.service.order.UserOrderService;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -25,7 +24,7 @@ import ru.don_polesie.back_end.service.inf.UserOrderService;
 )
 @RequestMapping("/api/order")
 public class UserManipulationOrderController {
-    private final UserOrderServiceImpl orderServiceImpl;
+    private final UserOrderService orderServiceImpl;
     private final SecurityUtils securityUtils;
 
     @Operation(
@@ -38,9 +37,9 @@ public class UserManipulationOrderController {
             @ApiResponse(responseCode = "404", description = "Товар или адрес не найден")
     })
     @PostMapping
-    public ResponseEntity<OrderCreateResponse> save(@RequestBody Address address) {
+    public ResponseEntity<OrderCreateResponse> save(@RequestParam @Min(value = 1) Long addressId) {
         User user = securityUtils.getCurrentUser();
-        var resp = orderServiceImpl.save(user, address);
+        var resp = orderServiceImpl.save(user, addressId);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(resp);

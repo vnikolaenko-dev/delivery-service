@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.don_polesie.back_end.dto.auth.JwtAuthRequest;
 import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
-import ru.don_polesie.back_end.service.impl.auth.StaffAuthServiceImpl;
-import ru.don_polesie.back_end.service.inf.AuthService;
+import ru.don_polesie.back_end.service.auth.StaffAuthService;
 
 @Tag(
         name = "Аутентификация",
@@ -23,7 +22,7 @@ import ru.don_polesie.back_end.service.inf.AuthService;
 @RestController
 @RequiredArgsConstructor
 public class StaffAuthControllerImpl {
-    private final StaffAuthServiceImpl authService;
+    private final StaffAuthService authService;
 
     @Operation(
             summary = "Вход в систему",

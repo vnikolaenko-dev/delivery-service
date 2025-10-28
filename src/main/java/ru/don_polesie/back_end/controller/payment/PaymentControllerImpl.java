@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.don_polesie.back_end.dto.payment.CreatePaymentRequest;
-import ru.don_polesie.back_end.service.inf.YooKassaService;
+import ru.don_polesie.back_end.service.system.YooKassaService;
 
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.service.impl.auth;
+package ru.don_polesie.back_end.service.auth;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,14 +7,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
 import ru.don_polesie.back_end.security.admin.JwtTokenProvider;
-import ru.don_polesie.back_end.service.impl.StaffServiceImpl;
+import ru.don_polesie.back_end.service.staffOnly.StaffService;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class JWTGeneratorService {
     private final AuthenticationManager authenticationManager;
-    private final StaffServiceImpl userServiceImpl;
+    private final StaffService userServiceImpl;
     private final JwtTokenProvider jwtTokenProvider;
 
 

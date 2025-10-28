@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.service.impl.order;
+package ru.don_polesie.back_end.service.order;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

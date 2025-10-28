@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.service.impl;
+package ru.don_polesie.back_end.service.product;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,14 +13,11 @@ import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.mapper.ProductMapper;
 import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.ProductRepository;
-import ru.don_polesie.back_end.service.inf.WorkerProductService;
-import ru.don_polesie.back_end.service.inf.product.BrandService;
-import ru.don_polesie.back_end.service.inf.product.CategoryService;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class WorkerProductServiceImpl implements WorkerProductService {
+public class WorkerProductService {
 
     private static final int PAGE_SIZE = 10;
 
@@ -35,7 +32,7 @@ public class WorkerProductServiceImpl implements WorkerProductService {
      * @param pageNumber номер страницы (начинается с 1)
      * @return страница с товарами в формате DTO
      */
-    @Override
+
     public Page<ProductDtoRR> findProductsPage(Integer pageNumber) {
         Pageable pageable = createDefaultPageable(pageNumber);
         return productRepository.findAllByAmountGreaterThan(0, pageable)
@@ -49,7 +46,7 @@ public class WorkerProductServiceImpl implements WorkerProductService {
      * @return DTO товара
      * @throws ObjectNotFoundException если товар не найден
      */
-    @Override
+
     public ProductDtoRR findById(Long id) {
         return productRepository.findById(id)
                 .map(productMapper::toProductDtoRR)
@@ -63,7 +60,7 @@ public class WorkerProductServiceImpl implements WorkerProductService {
      * @param pageNumber номер страницы
      * @return страница с найденными товарами
      */
-    @Override
+
     public Page<ProductDtoRR> findAllByParams(ProductDtoSearch productDtoSearch, Integer pageNumber) {
         Pageable pageable = PageRequest.of(pageNumber, PAGE_SIZE);
         return productRepository.findProductsByParams(
@@ -82,7 +79,7 @@ public class WorkerProductServiceImpl implements WorkerProductService {
      * @param pageNumber номер страницы
      * @return страница с найденными товарами
      */
-    @Override
+
     public Page<ProductDtoRR> findProductByQuery(String query, Integer pageNumber) {
         Pageable pageable = createDefaultPageable(pageNumber);
         return productRepository.searchProductsByQuery(query, pageable)
@@ -97,7 +94,7 @@ public class WorkerProductServiceImpl implements WorkerProductService {
      * @return обновленный DTO товара
      * @throws ObjectNotFoundException если товар не найден
      */
-    @Override
+
     @Transactional
     public ProductDtoRR update(ProductDtoRR productDtoRR, Long id) {
         Product existingProduct = getProductById(id);
@@ -113,7 +110,7 @@ public class WorkerProductServiceImpl implements WorkerProductService {
      * @param id идентификатор товара для удаления
      * @throws ObjectNotFoundException если товар не найден
      */
-    @Override
+
     @Transactional
     public void deleteById(Long id) {
         if (!productRepository.existsById(id)) {
@@ -128,7 +125,7 @@ public class WorkerProductServiceImpl implements WorkerProductService {
      * @param productDtoRR DTO с данными нового товара
      * @return сохраненный DTO товара
      */
-    @Override
+
     @Transactional
     public ProductDtoRR save(ProductDtoRR productDtoRR) {
         Product newProduct = productMapper.productDtoRRtoProduct(productDtoRR);

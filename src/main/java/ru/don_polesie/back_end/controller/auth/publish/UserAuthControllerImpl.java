@@ -10,15 +10,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
 import ru.don_polesie.back_end.dto.auth.JwtRefreshRequest;
-import ru.don_polesie.back_end.service.impl.auth.UserAuthService;
-import ru.don_polesie.back_end.service.inf.AuthService;
+import ru.don_polesie.back_end.service.auth.UserAuthService;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/auth/user")
 public class UserAuthControllerImpl {
     private final UserAuthService userAuthService;
-    private final AuthService authServiceImpl;
 
     @PostMapping("/get-password")
     public ResponseEntity<JwtAuthResponse> getPassword(@RequestParam String phoneNumber) {
@@ -42,7 +40,7 @@ public class UserAuthControllerImpl {
     )
     @PostMapping("/refresh")
     public ResponseEntity<JwtAuthResponse> refresh(JwtRefreshRequest request) {
-        JwtAuthResponse jwtAuthResponse = authServiceImpl.refresh(request.getRefreshToken());
+        JwtAuthResponse jwtAuthResponse = userAuthService.refresh(request.getRefreshToken());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(jwtAuthResponse);

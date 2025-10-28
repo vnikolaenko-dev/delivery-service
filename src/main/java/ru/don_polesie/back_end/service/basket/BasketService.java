@@ -12,7 +12,7 @@ import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.BasketProductRepository;
 import ru.don_polesie.back_end.repository.BasketRepository;
 import ru.don_polesie.back_end.repository.ProductRepository;
-import ru.don_polesie.back_end.service.impl.order.PriceService;
+import ru.don_polesie.back_end.service.order.PriceService;
 
 import java.math.BigDecimal;
 
@@ -26,6 +26,10 @@ public class BasketService {
     private final BasketProductRepository basketProductRepository;
     private final PriceService priceService;
     private final ProductRepository productRepository;
+
+    public Basket getBasket(String phoneNumber) {
+        return getBasketByUserPhoneNumber(phoneNumber);
+    }
 
     /**
      * Добавление товара в корзину пользователя по номеру телефона.
@@ -118,5 +122,6 @@ public class BasketService {
                 .orElseThrow(() -> new ObjectNotFoundException(
                         "Basket product not found for basketId: " + basketId + " and productId: " + productId));
     }
+
 }
 

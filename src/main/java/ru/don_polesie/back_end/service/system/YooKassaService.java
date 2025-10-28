@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.service.impl.system;
+package ru.don_polesie.back_end.service.system;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,7 +11,6 @@ import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.model.order.Order;
 import ru.don_polesie.back_end.model.order.OrderProduct;
 import ru.don_polesie.back_end.repository.OrderRepository;
-import ru.don_polesie.back_end.service.inf.YooKassaService;
 import ru.don_polesie.back_end.utils.CidrUtils;
 
 
@@ -27,7 +26,7 @@ import java.util.*;
 
 
 @Service
-public class YooKassaServiceImpl implements YooKassaService {
+public class YooKassaService {
 
     @Value("${security.YooKassa.shopId}")
     private String shopId;
@@ -40,7 +39,7 @@ public class YooKassaServiceImpl implements YooKassaService {
     private final OrderRepository orderRepository;
 
     @Autowired
-    public YooKassaServiceImpl(OrderRepository orderRepository) throws Exception {
+    public YooKassaService(OrderRepository orderRepository) throws Exception {
         this.orderRepository = orderRepository;
         this.httpClient = HttpClient.newHttpClient();
         this.mapper = new ObjectMapper();
@@ -62,7 +61,6 @@ public class YooKassaServiceImpl implements YooKassaService {
         this.allowedCidrs = Collections.unmodifiableList(list);
     }
 
-    @Override
     @Transactional
     public JsonNode createPayment(Long orderId) throws Exception {
         var order = orderRepository
@@ -119,7 +117,6 @@ public class YooKassaServiceImpl implements YooKassaService {
         }
     }
 
-    @Override
     public JsonNode getPayment(Long orderId) throws Exception {
         // 1. Достаем заказ и его paymentId
         Order order = orderRepository.findById(Long.valueOf(orderId))
@@ -169,7 +166,6 @@ public class YooKassaServiceImpl implements YooKassaService {
         }
     }
 
-    @Override
     @Transactional
     public void storeNotification(JsonNode notification) {
         var orderId = extractOrderId(notification);
@@ -193,7 +189,7 @@ public class YooKassaServiceImpl implements YooKassaService {
      * 2. Тело — тип notification, есть поле event и object.
      * 3. Статус объекта актуален (сравнение с повторным запросом).
      */
-    @Override
+
     public boolean verifyNotification(String remoteIp, JsonNode notification) {
         try {
             // 1. IP

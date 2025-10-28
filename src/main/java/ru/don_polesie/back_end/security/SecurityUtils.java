@@ -5,12 +5,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import ru.don_polesie.back_end.model.User;
-import ru.don_polesie.back_end.service.inf.UserService;
+import ru.don_polesie.back_end.service.staffOnly.StaffService;
+
 @Component
 @RequiredArgsConstructor
 public class SecurityUtils {
 
-    private final UserService userService;
+    private final StaffService userService;
 
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import ru.don_polesie.back_end.model.enums.OrderStatus;
 import ru.don_polesie.back_end.model.order.Order;
 import ru.don_polesie.back_end.repository.OrderRepository;
-import ru.don_polesie.back_end.service.impl.system.YooKassaServiceImpl;
+import ru.don_polesie.back_end.service.system.YooKassaService;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ import java.util.List;
 public class PaymentStatusChecker {
 
     private final OrderRepository orderRepository;
-    private final YooKassaServiceImpl yooKassaService;
+    private final YooKassaService yooKassaService;
 
     /**
      * Каждые 5 минут проверяем заказы со статусом PAYING

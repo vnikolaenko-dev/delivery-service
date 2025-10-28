@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.don_polesie.back_end.dto.product.ProductDtoRR;
-import ru.don_polesie.back_end.service.inf.WorkerProductService;
+import ru.don_polesie.back_end.service.product.WorkerProductService;
 
 @RestController
 @RequiredArgsConstructor

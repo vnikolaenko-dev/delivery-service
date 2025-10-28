@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.service.impl;
+package ru.don_polesie.back_end.service.userOnly;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -7,13 +7,12 @@ import ru.don_polesie.back_end.mapper.AddressMapper;
 import ru.don_polesie.back_end.model.Address;
 import ru.don_polesie.back_end.model.User;
 import ru.don_polesie.back_end.repository.AddressRepository;
-import ru.don_polesie.back_end.service.inf.UserAddressService;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UserAddressServiceImpl implements UserAddressService {
+public class UserAddressService {
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
 
@@ -23,7 +22,7 @@ public class UserAddressServiceImpl implements UserAddressService {
      * @param user пользователь, для которого запрашиваются адреса
      * @return список адресов в формате DTO
      */
-    @Override
+
     public List<AddressDTO> getUserAddresses(User user) {
         return addressRepository.findAllByUser(user)
                 .stream()
@@ -38,7 +37,7 @@ public class UserAddressServiceImpl implements UserAddressService {
      * @param user пользователь, для которого сохраняется адрес
      * @return строковое представление сохраненного адреса
      */
-    @Override
+
     public String save(AddressDTO addressDTO, User user) {
         Address address = addressMapper.toEntity(addressDTO);
         address.setUser(user);
@@ -53,7 +52,7 @@ public class UserAddressServiceImpl implements UserAddressService {
      * @param user пользователь, для проверки прав доступа
      * @throws IllegalArgumentException если адрес с указанным id не найден
      */
-    @Override
+
     public void delete(Long id, User user) {
         if (!addressRepository.existsById(id)) {
             throw new IllegalArgumentException(String.format("Address %n not found.", id));

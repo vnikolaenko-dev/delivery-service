@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.service.impl.system;
+package ru.don_polesie.back_end.service.system;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -15,7 +15,6 @@ import ru.don_polesie.back_end.mapper.ProductMapper;
 import ru.don_polesie.back_end.model.product.Brand;
 import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.ProductRepository;
-import ru.don_polesie.back_end.service.inf.product.ProductImportService;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -27,7 +26,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Slf4j
-public class ProductImportServiceImpl implements ProductImportService {
+public class ProductImportService {
 
     @Value("${import.directory}")
     private String importDirectory;
@@ -36,7 +35,6 @@ public class ProductImportServiceImpl implements ProductImportService {
 
     private final ProductMapper productMapper;
 
-    @Override
     public ProductListDtoXML parse(File xmlFile) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(ProductListDtoXML.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();

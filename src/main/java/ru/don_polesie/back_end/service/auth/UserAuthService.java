@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.service.impl.auth;
+package ru.don_polesie.back_end.service.auth;
 
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -8,10 +8,10 @@ import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
 import ru.don_polesie.back_end.model.Role;
 import ru.don_polesie.back_end.model.User;
 import ru.don_polesie.back_end.model.basket.Basket;
-import ru.don_polesie.back_end.model.basket.BasketProduct;
 import ru.don_polesie.back_end.repository.BasketRepository;
 import ru.don_polesie.back_end.repository.RoleRepository;
 import ru.don_polesie.back_end.repository.UserRepository;
+import ru.don_polesie.back_end.security.admin.JwtTokenProvider;
 import ru.don_polesie.back_end.utils.SmsSenderHttpClient;
 
 import java.util.HashSet;
@@ -29,6 +29,7 @@ public class UserAuthService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final BasketRepository basketRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * Отправка временного пароля
@@ -59,6 +60,17 @@ public class UserAuthService {
         }
         // codes.entrySet().removeIf(e -> System.currentTimeMillis() > e.getValue().expireAt);
         return null;
+    }
+
+    /**
+     * Обновление access токена по refresh токену
+     *
+     * @param refreshToken refresh токен
+     * @return новый набор access и refresh токенов
+     */
+
+    public JwtAuthResponse refresh(String refreshToken) {
+        return jwtTokenProvider.refreshUserToken(refreshToken);
     }
 
     private final PasswordEncoder passwordEncoder;

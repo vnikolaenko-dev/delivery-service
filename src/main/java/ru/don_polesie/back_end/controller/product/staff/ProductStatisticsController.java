@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.don_polesie.back_end.service.inf.WorkerOrderService;
+import ru.don_polesie.back_end.service.order.WorkerOrderService;
 
 import java.time.Instant;
 

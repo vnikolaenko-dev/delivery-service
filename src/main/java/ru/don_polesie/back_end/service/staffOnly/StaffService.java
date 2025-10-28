@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.service.impl;
+package ru.don_polesie.back_end.service.staffOnly;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -7,12 +7,12 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.model.User;
 import ru.don_polesie.back_end.repository.UserRepository;
-import ru.don_polesie.back_end.service.inf.UserService;
+
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class StaffServiceImpl implements UserService {
+public class StaffService {
 
     private final UserRepository userRepository;
 
@@ -23,7 +23,7 @@ public class StaffServiceImpl implements UserService {
      * @return найденный пользователь
      * @throws ObjectNotFoundException если пользователь с указанным именем не найден
      */
-    @Override
+
     public User getByPhoneNumber(String phoneNumber) {
         return userRepository
                 .findByPhoneNumber(phoneNumber)
@@ -40,7 +40,7 @@ public class StaffServiceImpl implements UserService {
      * @return найденный пользователь
      * @throws ObjectNotFoundException если пользователь с указанным id не найден
      */
-    @Override
+
     public User getById(Long userId) {
         return userRepository
                 .findById(userId)

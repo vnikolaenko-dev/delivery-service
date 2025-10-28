@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.don_polesie.back_end.model.product.Brand;
-import ru.don_polesie.back_end.service.inf.product.BrandService;
+import ru.don_polesie.back_end.service.product.BrandService;
 
 import java.util.List;
 

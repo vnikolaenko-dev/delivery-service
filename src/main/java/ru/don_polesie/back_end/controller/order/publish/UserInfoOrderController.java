@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.don_polesie.back_end.dto.order.OrderDtoRR;
 import ru.don_polesie.back_end.security.SecurityUtils;
-import ru.don_polesie.back_end.service.inf.UserOrderService;
+import ru.don_polesie.back_end.service.order.UserOrderService;
 
 
 @RestController
@@ -23,7 +23,7 @@ import ru.don_polesie.back_end.service.inf.UserOrderService;
 )
 @RequestMapping("/api/order")
 public class UserInfoOrderController {
-    private final UserOrderService orderServiceImpl;
+    private final UserOrderService orderService;
     private final SecurityUtils securityUtils;
 
     @Operation(
@@ -33,9 +33,10 @@ public class UserInfoOrderController {
     @GetMapping("")
     public ResponseEntity<Page<OrderDtoRR>> findOrdersPage(@RequestParam @Min(value = 1) Integer pageNumber) {
         String phoneNumber = securityUtils.getCurrentPhoneNumber();
+        Page<OrderDtoRR> ordersPage = orderService.findUserOrdersPage(pageNumber, phoneNumber);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
-                .body(orderServiceImpl.findUserOrdersPage(pageNumber, phoneNumber));
+                .body(ordersPage);
     }
 
     @Operation(
@@ -47,7 +48,7 @@ public class UserInfoOrderController {
         String phoneNumber = securityUtils.getCurrentPhoneNumber();
         return ResponseEntity
                 .status(HttpStatus.FOUND)
-                .body(orderServiceImpl.findShippedUserOrdersPage(pageNumber, phoneNumber));
+                .body(orderService.findShippedUserOrdersPage(pageNumber, phoneNumber));
     }
 
     @Operation(
@@ -62,6 +63,6 @@ public class UserInfoOrderController {
     public ResponseEntity<OrderDtoRR> findById(@PathVariable @Min(value = 1) Long id) {
         return ResponseEntity
                 .status(HttpStatus.FOUND)
-                .body(orderServiceImpl.findById(id));
+                .body(orderService.findById(id));
     }
 }

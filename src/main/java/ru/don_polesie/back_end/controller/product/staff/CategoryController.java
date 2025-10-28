@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.don_polesie.back_end.model.product.Category;
-import ru.don_polesie.back_end.service.inf.product.CategoryService;
+import ru.don_polesie.back_end.service.product.CategoryService;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.service.impl;
+package ru.don_polesie.back_end.service.order;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,9 +15,8 @@ import ru.don_polesie.back_end.model.order.Order;
 import ru.don_polesie.back_end.model.order.OrderProduct;
 import ru.don_polesie.back_end.repository.OrderProductRepository;
 import ru.don_polesie.back_end.repository.OrderRepository;
-import ru.don_polesie.back_end.service.inf.WorkerOrderService;
-import ru.don_polesie.back_end.service.impl.order.PriceService;
-import ru.don_polesie.back_end.service.impl.system.YooKassaServiceImpl;
+
+import ru.don_polesie.back_end.service.system.YooKassaService;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -27,17 +26,17 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class WorkerOrderServiceImpl implements WorkerOrderService {
+public class WorkerOrderService {
     private static final int PAGE_SIZE = 10;
 
     private final OrderRepository orderRepository;
     private final OrderProductRepository orderProductRepository;
     private final OrderMapper orderMapper;
-    private final YooKassaServiceImpl yooKassaService;
+    private final YooKassaService yooKassaService;
     private final PriceService priceService;
 
 
-    @Override
+
     public OrderDtoRR findById(Long id) {
         Order order = orderRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Order not found"));
         return orderMapper.toOrderDtoRR(order);
@@ -49,7 +48,7 @@ public class WorkerOrderServiceImpl implements WorkerOrderService {
      * @param pageNumber номер страницы (начинается с 1)
      * @return страница заказов в формате DTO
      */
-    @Override
+
     public Page<OrderDtoRR> findOrdersPage(Integer pageNumber) {
         var pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, Sort.by("id").descending());
         return orderRepository.findAll(pageable)
@@ -62,7 +61,7 @@ public class WorkerOrderServiceImpl implements WorkerOrderService {
      * @param pageNumber номер страницы (начинается с 1)
      * @return страница заказов в формате DTO
      */
-    @Override
+
     public Page<OrderDtoRR> findMoneyReservaitedOrdersPage(Integer pageNumber) {
         var pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, Sort.by("id").descending());
         return orderRepository.findAllMoneyReservaited(pageable)
@@ -75,7 +74,7 @@ public class WorkerOrderServiceImpl implements WorkerOrderService {
      * @param id идентификатор заказа
      * @throws ObjectNotFoundException если заказ не найден
      */
-    @Override
+
     @Transactional
     public void markShipped(Long id) {
         Order order = getOrderById(id);
@@ -91,10 +90,13 @@ public class WorkerOrderServiceImpl implements WorkerOrderService {
      * @throws ObjectNotFoundException если заказ не найден
      * @throws IllegalArgumentException если не указан вес для весового товара
      */
-    @Override
+
     @Transactional
     public void processOrder(Long id, ProcessWeightsRequest request) {
         Order order = getOrderById(id);
+        if (!OrderStatus.MONEY_RESERVAITED.equals(order.getStatus())) {
+            throw new IllegalArgumentException("Order status is not MONEY_RESERVAITED");
+        }
         Map<Long, ProcessWeightsRequest.WeightDto> weightMap = createWeightMap(request);
 
         BigDecimal newTotal = processOrderProducts(order, weightMap);
@@ -110,7 +112,7 @@ public class WorkerOrderServiceImpl implements WorkerOrderService {
      * @param date дата для анализа продаж
      * @return общее количество проданного товара
      */
-    @Override
+
     public Long getTotalSalesForProductByDate(Long productId, Instant date) {
         return orderRepository.getTotalSalesForProductByDate(productId, date);
     }
@@ -122,9 +124,16 @@ public class WorkerOrderServiceImpl implements WorkerOrderService {
      * @param date дата для анализа
      * @return количество заказов
      */
-    @Override
+
     public Long getOrderCountForProductByDate(Long productId, Instant date) {
         return orderRepository.getOrderCountForProductByDate(productId, date);
+    }
+
+
+    public Page<OrderDtoRR> findOrdersPageWithStatus(Integer pageNumber, OrderStatus orderStatus) {
+        var pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, Sort.by("id").descending());
+        return orderRepository.findAllByStatus(orderStatus, pageable)
+                .map(orderMapper::toOrderDtoRR);
     }
 
     // ========== ПРИВАТНЫЕ ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========

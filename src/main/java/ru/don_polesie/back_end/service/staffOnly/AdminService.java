@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.service.impl;
+package ru.don_polesie.back_end.service.staffOnly;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -10,11 +10,10 @@ import org.springframework.stereotype.Service;
 import ru.don_polesie.back_end.dto.UserDTO;
 import ru.don_polesie.back_end.model.User;
 import ru.don_polesie.back_end.repository.UserRepository;
-import ru.don_polesie.back_end.service.inf.AdminService;
 
 @Service
 @RequiredArgsConstructor
-public class AdminServiceImpl implements AdminService {
+public class AdminService {
     // Константы для пагинации и ролей
     private static final int DEFAULT_PAGE_SIZE = 10;
     private static final String DEFAULT_SORT_FIELD = "id";
@@ -30,7 +29,7 @@ public class AdminServiceImpl implements AdminService {
      * @param pageNumber номер страницы (начинается с 1)
      * @return страница с пользователями в формате DTO
      */
-    @Override
+
     public Page<UserDTO> findUsersPage(Integer pageNumber) {
         Pageable pageable = createDefaultPageable(pageNumber);
         Page<User> usersPage = userRepository.findByRolesName(USER_ROLE_NAME, pageable);
@@ -43,7 +42,7 @@ public class AdminServiceImpl implements AdminService {
      * @param pageNumber номер страницы (начинается с 1)
      * @return страница с работниками в формате DTO
      */
-    @Override
+
     public Page<UserDTO> findWorkersPage(Integer pageNumber) {
         Pageable pageable = createDefaultPageable(pageNumber);
         Page<User> workersPage = userRepository.findByRolesName(WORKER_ROLE_NAME, pageable);
@@ -55,7 +54,7 @@ public class AdminServiceImpl implements AdminService {
      *
      * @param id идентификатор пользователя
      */
-    @Override
+
     public void deleteUser(Long id) {
         userRepository.deleteById(id.longValue());
     }
@@ -65,7 +64,7 @@ public class AdminServiceImpl implements AdminService {
      *
      * @param userDTO данные пользователя для создания
      */
-    @Override
+
     public void createUser(UserDTO userDTO) {
         User user = createUserFromDTO(userDTO);
         userRepository.save(user);

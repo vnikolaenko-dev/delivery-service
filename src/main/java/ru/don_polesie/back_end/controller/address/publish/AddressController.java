@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.don_polesie.back_end.dto.AddressDTO;
 import ru.don_polesie.back_end.model.User;
 import ru.don_polesie.back_end.security.SecurityUtils;
-import ru.don_polesie.back_end.service.impl.UserAddressServiceImpl;
+import ru.don_polesie.back_end.service.userOnly.UserAddressService;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ import java.util.List;
 )
 @RequestMapping("/api/address")
 public class AddressController {
-    private final UserAddressServiceImpl userAddressService;
+    private final UserAddressService userAddressService;
     private final SecurityUtils securityUtils;
 
     @Operation(
@@ -40,8 +40,9 @@ public class AddressController {
             summary = "Добавить адрес доставки",
             description = "Создает новый адрес доставки для текущего пользователя"
     )
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<String> createUserAddress(@RequestBody AddressDTO address) {
+        System.out.println(address);
         User user = securityUtils.getCurrentUser();
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -52,7 +53,7 @@ public class AddressController {
             summary = "Удалить адрес доставки",
             description = "Удаляет адрес доставки по идентификатору"
     )
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUserAddress(@PathVariable Long id) {
         User user = securityUtils.getCurrentUser();
         userAddressService.delete(id, user);

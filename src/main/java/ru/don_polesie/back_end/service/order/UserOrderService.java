@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.service.impl;
+package ru.don_polesie.back_end.service.order;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,22 +24,16 @@ import ru.don_polesie.back_end.model.order.OrderProduct;
 import ru.don_polesie.back_end.model.order.OrderProductId;
 import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.*;
-import ru.don_polesie.back_end.service.inf.UserOrderService;
-import ru.don_polesie.back_end.service.inf.YooKassaService;
-import ru.don_polesie.back_end.service.impl.order.PriceService;
+import ru.don_polesie.back_end.service.system.YooKassaService;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class UserOrderServiceImpl implements UserOrderService {
+public class UserOrderService {
 
     private static final int PAGE_SIZE = 10;
 
@@ -60,7 +54,7 @@ public class UserOrderServiceImpl implements UserOrderService {
      * @return DTO заказа
      * @throws ObjectNotFoundException если заказ не найден
      */
-    @Override
+
     public OrderDtoRR findById(Long id) {
         return orderRepository.findById(id)
                 .map(orderMapper::toOrderDtoRR)
@@ -74,7 +68,7 @@ public class UserOrderServiceImpl implements UserOrderService {
      * @param phoneNumber номер пользователя
      * @return страница с заказами
      */
-    @Override
+
     public Page<OrderDtoRR> findUserOrdersPage(Integer pageNumber, String phoneNumber) {
         Pageable pageable = createPageable(pageNumber);
         return orderRepository.findByUserPhoneNumber(phoneNumber, pageable)
@@ -88,7 +82,7 @@ public class UserOrderServiceImpl implements UserOrderService {
      * @param phoneNumber номер пользователя
      * @return страница с доставленными заказами
      */
-    @Override
+
     public Page<OrderDtoRR> findShippedUserOrdersPage(Integer pageNumber, String phoneNumber) {
         Pageable pageable = createPageable(pageNumber);
         return orderRepository.findByUserPhoneNumberAndStatus(phoneNumber, OrderStatus.SHIPPED, pageable)
@@ -100,7 +94,7 @@ public class UserOrderServiceImpl implements UserOrderService {
      *
      * @param orderId идентификатор заказа
      */
-    @Override
+
     @Transactional
     public void deleteOrder(Long orderId) {
         log.info("Deleting order with id: {}", orderId);
@@ -116,7 +110,12 @@ public class UserOrderServiceImpl implements UserOrderService {
      * @throws RuntimeException если не удалось создать платеж
      */
     @Transactional
-    public OrderCreateResponse save(User user, Address address) {
+    public OrderCreateResponse save(User user, Long addressId) {
+        Optional<Address> address = addressRepository.findById(addressId);
+        if (address.isEmpty()) {
+            throw new ObjectNotFoundException("Address not found with id: " + addressId);
+        }
+
         log.info("Saving order for user: {}", user.getPhoneNumber());
 
         // Получаем корзину пользователя
@@ -130,8 +129,9 @@ public class UserOrderServiceImpl implements UserOrderService {
         // Создаем заказ
         Order order = new Order();
         order.setUser(user);
-        order.setAddress(address);
-        order.setStatus(OrderStatus.NEW);
+        order.setAddress(address.get());
+        order.setStatus(OrderStatus.PAYING);
+        order.setPhoneNumber(order.getUser().getPhoneNumber());
 
         BigDecimal totalAmount = BigDecimal.ZERO;
 
@@ -149,10 +149,15 @@ public class UserOrderServiceImpl implements UserOrderService {
             orderProduct.setProduct(product);
             orderProduct.setQuantity(quantity);
 
+            orderProduct.setId(new OrderProductId(
+                    order.getId(),
+                    basketProduct.getProduct().getId()
+            ));
+
             orderProducts.add(orderProduct);
         }
-
         order.setTotalAmount(totalAmount);
+        order.getOrderProducts().addAll(orderProducts);
 
         // Сохраняем заказ
         Order savedOrder = orderRepository.save(order);
@@ -168,7 +173,7 @@ public class UserOrderServiceImpl implements UserOrderService {
     }
 
 
-    @Override
+    @Deprecated
     @Transactional
     public OrderCreateResponse changeQuantityProductFromOrder(Long orderId, Long productId, int quantity) {
         Order order = getOrderById(orderId);
@@ -196,7 +201,7 @@ public class UserOrderServiceImpl implements UserOrderService {
      * @param productId идентификатор товара
      * @throws ObjectNotFoundException если заказ, товар или связка не найдены
      */
-    @Override
+    @Deprecated
     @Transactional
     public OrderCreateResponse deleteProductFromOrder(Long orderId, Long productId) {
         Order order = getOrderById(orderId);
