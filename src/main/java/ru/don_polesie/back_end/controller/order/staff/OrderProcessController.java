@@ -42,7 +42,7 @@ public class OrderProcessController {
             description = "Изменение статуса заказа на 'отправлен' после комплектации"
     )
     @PutMapping("/ship/{id}")
-    public ResponseEntity<Void> markShipped(@PathVariable @Min(value = 1)Long id) {
+    public ResponseEntity<Void> markShipped(@PathVariable @Min(value = 1) Long id) {
         workOrderService.markShipped(id);
         return ResponseEntity.ok().build();
     }

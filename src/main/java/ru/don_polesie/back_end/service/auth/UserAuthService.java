@@ -5,6 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
+import ru.don_polesie.back_end.exceptions.RequestValidationException;
 import ru.don_polesie.back_end.model.Role;
 import ru.don_polesie.back_end.model.User;
 import ru.don_polesie.back_end.model.basket.Basket;
@@ -13,7 +14,9 @@ import ru.don_polesie.back_end.repository.RoleRepository;
 import ru.don_polesie.back_end.repository.UserRepository;
 import ru.don_polesie.back_end.security.admin.JwtTokenProvider;
 import ru.don_polesie.back_end.utils.SmsSenderHttpClient;
+import ru.don_polesie.back_end.validator.PhoneNumberValidator;
 
+import javax.management.BadAttributeValueExpException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -34,7 +37,11 @@ public class UserAuthService {
     /**
      * Отправка временного пароля
      */
-    public void sendTemporaryPassword(String number) {
+    public void sendTemporaryPassword(String number) throws BadAttributeValueExpException {
+        if (!PhoneNumberValidator.isValidRussianPhone(number)) {
+            throw new RequestValidationException("Некорректный номер телефона");
+        }
+
         String code = generate4LetterCode();
         codes.put(number, new CodeEntry(code, System.currentTimeMillis() + 5 * 60 * 1000));
         SmsSenderHttpClient.sendSms(number, "Ваш код для входа: " + code);
@@ -43,7 +50,11 @@ public class UserAuthService {
     /**
      * Проверка временного пароля
      */
-    public JwtAuthResponse checkTemporaryPassword(String number, String code) {
+    public JwtAuthResponse checkTemporaryPassword(String number, String code) throws BadAttributeValueExpException {
+        if (!PhoneNumberValidator.isValidRussianPhone(number)) {
+            throw new RequestValidationException("Некорректный номер телефона");
+        }
+
         CodeEntry entry = codes.get(number);
         if (entry != null && entry.code.equals(code) && System.currentTimeMillis() < entry.expireAt) {
             // Если номера нет в бд - сохраняем нового пользователя
@@ -58,8 +69,8 @@ public class UserAuthService {
             codes.remove(number);
             return jwtGeneratorService.generateJWT(number, code); // пример, подставь свою реализацию
         }
-        // codes.entrySet().removeIf(e -> System.currentTimeMillis() > e.getValue().expireAt);
-        return null;
+
+        throw new RequestValidationException("Некорректный номер телефона");
     }
 
     /**

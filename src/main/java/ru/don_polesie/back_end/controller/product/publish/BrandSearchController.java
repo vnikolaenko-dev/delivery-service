@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.controller.product.staff;
+package ru.don_polesie.back_end.controller.product.publish;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,15 +11,15 @@ import ru.don_polesie.back_end.service.product.BrandService;
 
 import java.util.List;
 
+
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/staff/brand")
-public class BrandController {
+@RequestMapping("/api/brand")
+public class BrandSearchController {
     private BrandService brandService;
 
-    @GetMapping("/create")
-    public ResponseEntity<Void> createBrand(@RequestParam String name) {
-        brandService.save(new Brand(name));
-        return ResponseEntity.ok().build();
+    @GetMapping
+    public ResponseEntity<List<Brand>> getBrands(){
+        return ResponseEntity.ok(brandService.findAll());
     }
 }

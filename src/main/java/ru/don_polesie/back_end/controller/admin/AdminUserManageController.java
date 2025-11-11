@@ -2,6 +2,7 @@ package ru.don_polesie.back_end.controller.admin;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,7 @@ import ru.don_polesie.back_end.service.staffOnly.AdminService;
         description = "API для управления пользователями и административных функций"
 )
 @RequestMapping("/api/admin")
-public class AdminControllerImpl {
+public class AdminUserManageController {
 
     private final AdminService adminService;
 
@@ -26,7 +27,7 @@ public class AdminControllerImpl {
             description = "Возвращает постраничный список всех зарегистрированных пользователей системы"
     )
     @GetMapping("/users")
-    public ResponseEntity<Page<UserDTO>> findUsersPage(@RequestParam Integer pageNumber) {
+    public ResponseEntity<Page<UserDTO>> findUsersPage(@RequestParam @Min(0) Integer pageNumber) {
         Page<UserDTO> usersPage = adminService.findUsersPage(pageNumber);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
@@ -38,7 +39,7 @@ public class AdminControllerImpl {
             description = "Возвращает постраничный список всех сотрудников с правами работника"
     )
     @GetMapping("/workers")
-    public ResponseEntity<Page<UserDTO>> findWorkersPage(@RequestParam Integer pageNumber) {
+    public ResponseEntity<Page<UserDTO>> findWorkersPage(@RequestParam @Min(0) Integer pageNumber) {
         Page<UserDTO> workersPage = adminService.findWorkersPage(pageNumber);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
@@ -58,11 +59,23 @@ public class AdminControllerImpl {
     }
 
     @Operation(
+            summary = "Обновить пользователя",
+            description = "Обновляет пользователя"
+    )
+    @PostMapping("/user/update")
+    public ResponseEntity<Void> updateUser(@RequestBody UserDTO userDTO) {
+        adminService.createUser(userDTO);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
+    }
+
+    @Operation(
             summary = "Удалить пользователя",
             description = "Полностью удаляет пользователя из системы по его идентификатору"
     )
     @DeleteMapping("/user/delete/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable @Min(0) Long id) {
         adminService.deleteUser(id);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)

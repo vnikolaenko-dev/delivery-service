@@ -70,6 +70,11 @@ public class AdminService {
         userRepository.save(user);
     }
 
+    public void updateUser(UserDTO userDTO) {
+        User user = createUserFromDTO(userDTO);
+        userRepository.save(user);
+    }
+
     // ========== ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========
 
     /**

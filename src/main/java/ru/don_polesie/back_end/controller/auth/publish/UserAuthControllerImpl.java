@@ -12,6 +12,8 @@ import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
 import ru.don_polesie.back_end.dto.auth.JwtRefreshRequest;
 import ru.don_polesie.back_end.service.auth.UserAuthService;
 
+import javax.management.BadAttributeValueExpException;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/auth/user")
@@ -19,7 +21,7 @@ public class UserAuthControllerImpl {
     private final UserAuthService userAuthService;
 
     @PostMapping("/get-password")
-    public ResponseEntity<JwtAuthResponse> getPassword(@RequestParam String phoneNumber) {
+    public ResponseEntity<JwtAuthResponse> getPassword(@RequestParam String phoneNumber) throws BadAttributeValueExpException {
         userAuthService.sendTemporaryPassword(phoneNumber);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -27,7 +29,7 @@ public class UserAuthControllerImpl {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtAuthResponse> checkPassword(@RequestParam String phoneNumber, @RequestParam String password) {
+    public ResponseEntity<JwtAuthResponse> checkPassword(@RequestParam String phoneNumber, @RequestParam String password) throws BadAttributeValueExpException {
         JwtAuthResponse jwtAuthResponse = userAuthService.checkTemporaryPassword(phoneNumber, password);
         return ResponseEntity
                 .status(HttpStatus.OK)

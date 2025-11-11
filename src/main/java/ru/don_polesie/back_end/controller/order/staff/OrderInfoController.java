@@ -1,6 +1,7 @@
 package ru.don_polesie.back_end.controller.order.staff;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class OrderInfoController {
             description = "Возвращает заказ по id"
     )
     @GetMapping("/{id}")
-    public ResponseEntity<OrderDtoRR> findById(@PathVariable Long id) {
+    public ResponseEntity<OrderDtoRR> findById(@PathVariable @Min(1) Long id) {
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(workOrderService.findById(id));
@@ -32,7 +33,7 @@ public class OrderInfoController {
             description = "Возвращает страницу заказов, требующих обработки сотрудниками"
     )
     @GetMapping
-    public ResponseEntity<Page<OrderDtoRR>> findOrdersPage(@RequestParam Integer pageNumber) {
+    public ResponseEntity<Page<OrderDtoRR>> findOrdersPage(@RequestParam @Min(0) Integer pageNumber) {
         Page<OrderDtoRR> ordersPage = workOrderService.findOrdersPage(pageNumber);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
@@ -44,7 +45,7 @@ public class OrderInfoController {
             description = "Возвращает страницу заказов с определенным статусом"
     )
     @GetMapping("/status")
-    public ResponseEntity<Page<OrderDtoRR>> findByStatus(@RequestParam Integer pageNumber, @RequestParam String status) {
+    public ResponseEntity<Page<OrderDtoRR>> findByStatus(@RequestParam @Min(0) Integer pageNumber, @RequestParam String status) {
         OrderStatus orderStatus = OrderStatus.valueOf(status);
         Page<OrderDtoRR> ordersPage = workOrderService.findOrdersPageWithStatus(pageNumber, orderStatus);
         return ResponseEntity

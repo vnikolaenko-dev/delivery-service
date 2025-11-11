@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import ru.don_polesie.back_end.model.enums.OrderStatus;
 import ru.don_polesie.back_end.model.order.Order;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -54,4 +55,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     default Page<Order> findAllMoneyReservaited(Pageable pageable) {
         return findAllByStatus(OrderStatus.MONEY_RESERVAITED, pageable);
     }
+
+    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o " +
+            "WHERE o.createdAt BETWEEN :start AND :end AND o.status = ru.don_polesie.back_end.model.enums.OrderStatus.SHIPPED")
+    BigDecimal calculateRevenueByPeriod(@Param("start") Instant start, @Param("end") Instant end);
+
+
+    Long countByCreatedAtBetween(Instant start, Instant end);
 }

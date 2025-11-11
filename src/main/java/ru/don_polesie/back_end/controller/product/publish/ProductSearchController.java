@@ -34,7 +34,7 @@ public class ProductSearchController {
             @ApiResponse(responseCode = "200", description = "Список товаров успешно получен")
     })
     @GetMapping
-    public ResponseEntity<Page<ProductDtoRR>> findProductsPage(@RequestParam @Min(value = 1) Integer pageNumber) {
+    public ResponseEntity<Page<ProductDtoRR>> findProductsPage(@RequestParam @Min(value = 0) Integer pageNumber) {
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(productServiceImpl.findProductsPage(pageNumber));

@@ -31,7 +31,7 @@ public class UserInfoOrderController {
             description = "Возвращает все заказы пользователя"
     )
     @GetMapping("")
-    public ResponseEntity<Page<OrderDtoRR>> findOrdersPage(@RequestParam @Min(value = 1) Integer pageNumber) {
+    public ResponseEntity<Page<OrderDtoRR>> findOrdersPage(@RequestParam @Min(value = 0) Integer pageNumber) {
         String phoneNumber = securityUtils.getCurrentPhoneNumber();
         Page<OrderDtoRR> ordersPage = orderService.findUserOrdersPage(pageNumber, phoneNumber);
         return ResponseEntity
@@ -44,7 +44,7 @@ public class UserInfoOrderController {
             description = "Возвращает историю заказов текущего пользователя с пагинацией"
     )
     @GetMapping("/shipped")
-    public ResponseEntity<Page<OrderDtoRR>> findShippedUserOrdersPage(@RequestParam @Min(value = 1) Integer pageNumber) {
+    public ResponseEntity<Page<OrderDtoRR>> findShippedUserOrdersPage(@RequestParam @Min(value = 0) Integer pageNumber) {
         String phoneNumber = securityUtils.getCurrentPhoneNumber();
         return ResponseEntity
                 .status(HttpStatus.FOUND)

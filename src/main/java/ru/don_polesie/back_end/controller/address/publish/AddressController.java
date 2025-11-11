@@ -2,6 +2,7 @@ package ru.don_polesie.back_end.controller.address.publish;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class AddressController {
     private final SecurityUtils securityUtils;
 
     @Operation(
-            summary = "Получить мои адреса",
+            summary = "Получить адреса пользователя",
             description = "Возвращает список всех адресов доставки текущего пользователя"
     )
     @GetMapping
@@ -54,7 +55,7 @@ public class AddressController {
             description = "Удаляет адрес доставки по идентификатору"
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUserAddress(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUserAddress(@PathVariable @Min(0) Long id) {
         User user = securityUtils.getCurrentUser();
         userAddressService.delete(id, user);
         return ResponseEntity
