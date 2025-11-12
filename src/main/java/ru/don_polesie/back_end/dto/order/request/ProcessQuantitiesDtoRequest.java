@@ -10,20 +10,20 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProcessWeightsDtoRequest {
+public class ProcessQuantitiesDtoRequest {
 
-    private List<WeightDto> weights;
+    private List<QuantityDto> quantities;
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class WeightDto {
+    public static class QuantityDto {
         @NotNull(message = "productId обязателен")
         private Long productId;
 
-        @NotNull(message = "weight обязателен")
-        @PositiveOrZero(message = "Вес не может быть отрицательным")
-        private Integer weight;
+        @NotNull(message = "quantity обязателен")
+        @PositiveOrZero(message = "Количество товара не может быть отрицательным")
+        private Integer quantity;
     }
 }
 

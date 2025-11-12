@@ -8,7 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.don_polesie.back_end.dto.order.response.OrderDtoResponse;
-import ru.don_polesie.back_end.dto.order.request.ProcessWeightsDtoRequest;
+import ru.don_polesie.back_end.dto.order.request.ProcessQuantitiesDtoRequest;
 import ru.don_polesie.back_end.model.enums.OrderStatus;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.mapper.OrderMapper;
@@ -65,7 +65,7 @@ public class WorkerOrderService {
      */
 
     public Page<OrderDtoResponse> findMoneyReservaitedOrdersPage(Integer pageNumber) {
-        var pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, Sort.by("id").descending());
+        var pageable = PageRequest.of(pageNumber, PAGE_SIZE, Sort.by("id").descending());
         return orderRepository.findAllMoneyReservaited(pageable)
                 .map(orderMapper::toOrderDtoResponse);
     }
@@ -97,14 +97,14 @@ public class WorkerOrderService {
      */
 
     @Transactional
-    public void processOrder(Long id, ProcessWeightsDtoRequest request) {
+    public void processOrder(Long id, ProcessQuantitiesDtoRequest request) {
         Order order = getOrderById(id);
         if (!OrderStatus.MONEY_RESERVAITED.equals(order.getStatus())) {
             throw new IllegalArgumentException("Деньги не зарезервированны, заказ нельзя обработать");
         }
-        Map<Long, ProcessWeightsDtoRequest.WeightDto> weightMap = createWeightMap(request);
+        Map<Long, ProcessQuantitiesDtoRequest.QuantityDto> quantitesMap = createQuantitesMap(request);
 
-        BigDecimal newTotal = processOrderProducts(order, weightMap);
+        BigDecimal newTotal = processOrderProducts(order, quantitesMap);
         updateOrderPayment(order, newTotal);
 
         orderRepository.save(order);
@@ -173,14 +173,14 @@ public class WorkerOrderService {
     /**
      * Создает карту весов товаров для быстрого доступа
      *
-     * @param request запрос с весами товаров
-     * @return карта: productId -> WeightDto
+     * @param request запрос с количеством каждого товара
+     * @return карта: productId -> QuantityDto
      */
-    private Map<Long, ProcessWeightsDtoRequest.WeightDto> createWeightMap(ProcessWeightsDtoRequest request) {
-        return request.getWeights().stream()
-                .collect(Collectors.toMap(
-                        ProcessWeightsDtoRequest.WeightDto::getProductId,
-                        weight -> weight
+    private Map<Long, ProcessQuantitiesDtoRequest.QuantityDto> createQuantitesMap(ProcessQuantitiesDtoRequest request) {
+        return request.getQuantities().stream()
+                .collect(
+                        Collectors.toMap(
+                                ProcessQuantitiesDtoRequest.QuantityDto::getProductId, quantity -> quantity
                 ));
     }
 
@@ -191,9 +191,9 @@ public class WorkerOrderService {
      * @param weightMap карта весов товаров
      * @return новая общая стоимость заказа
      */
-    private BigDecimal processOrderProducts(Order order, Map<Long, ProcessWeightsDtoRequest.WeightDto> weightMap) {
+    private BigDecimal processOrderProducts(Order order, Map<Long, ProcessQuantitiesDtoRequest.QuantityDto> quantityDtoMap) {
         return order.getOrderProducts().stream()
-                .map(orderProduct -> processOrderProduct(orderProduct, weightMap))
+                .map(orderProduct -> processOrderProduct(orderProduct, quantityDtoMap))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
@@ -201,33 +201,32 @@ public class WorkerOrderService {
      * Обрабатывает один товар в заказе: обновляет количество и рассчитывает стоимость
      *
      * @param orderProduct товар в заказе
-     * @param weightMap карта весов товаров
+     * @param quantityDtoMapMap карта количества каждого товара
      * @return стоимость товара после обработки
      */
-    private BigDecimal processOrderProduct(OrderProduct orderProduct, Map<Long, ProcessWeightsDtoRequest.WeightDto> weightMap) {
-        int quantityGrams = getProductQuantity(orderProduct, weightMap);
-        updateOrderProductQuantity(orderProduct, quantityGrams);
-
-        return calculateProductCost(orderProduct, quantityGrams);
+    private BigDecimal processOrderProduct(OrderProduct orderProduct, Map<Long, ProcessQuantitiesDtoRequest.QuantityDto> quantityDtoMapMap) {
+        int quantity = getProductQuantity(orderProduct, quantityDtoMapMap);
+        updateOrderProductQuantity(orderProduct, quantity);
+        return calculateProductCost(orderProduct, quantity);
     }
 
     /**
      * Получает количество товара с учетом типа (весовой/штучный)
      *
      * @param orderProduct товар в заказе
-     * @param weightMap карта весов товаров
+     * @param quantityDtoMapMap карта количества каждого товара
      * @return количество в граммах (для весового) или штуках (для штучного)
      * @throws IllegalArgumentException если не указан вес для весового товара
      */
-    private int getProductQuantity(OrderProduct orderProduct, Map<Long, ProcessWeightsDtoRequest.WeightDto> weightMap) {
+    private int getProductQuantity(OrderProduct orderProduct, Map<Long, ProcessQuantitiesDtoRequest.QuantityDto> quantityDtoMapMap) {
         if (Boolean.TRUE.equals(orderProduct.getProduct().getIsWeighted())) {
-            ProcessWeightsDtoRequest.WeightDto weightDto = weightMap.get(orderProduct.getProduct().getId());
-            if (weightDto == null) {
+            ProcessQuantitiesDtoRequest.QuantityDto quantityDto = quantityDtoMapMap.get(orderProduct.getProduct().getId());
+            if (quantityDto == null) {
                 throw new IllegalArgumentException(
                         "Weight not provided for weighted product with id: " + orderProduct.getProduct().getId()
                 );
             }
-            return weightDto.getWeight();
+            return quantityDto.getQuantity();
         }
         return orderProduct.getQuantity();
     }
@@ -262,7 +261,6 @@ public class WorkerOrderService {
      */
     private void updateOrderPayment(Order order, BigDecimal newTotal) {
         order.setTotalAmount(newTotal);
-
         try {
             yooKassaService.getMoney(order);
             order.setStatus(OrderStatus.READY_FOR_DELIVERY);

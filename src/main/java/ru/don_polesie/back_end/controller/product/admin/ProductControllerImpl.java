@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.controller.product.staff;
+package ru.don_polesie.back_end.controller.product.admin;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -12,7 +12,7 @@ import ru.don_polesie.back_end.service.product.WorkerProductService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/staff/product")
+@RequestMapping("/api/admin/product")
 public class ProductControllerImpl {
 
     private final WorkerProductService productServiceImpl;

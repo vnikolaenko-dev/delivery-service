@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.controller.product.staff;
+package ru.don_polesie.back_end.controller.product.admin;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,13 +13,12 @@ import java.time.Instant;
         name = "Управление заказами (Работник)",
         description = "API для обработки и управления заказами сотрудниками"
 )
-@RequestMapping("/api/staff/order")
+@RequestMapping("/api/admin/order")
 @RestController
 @RequiredArgsConstructor
 public class ProductStatisticsController {
 
     private final WorkerOrderService workOrderService;
-
 
     @Operation(
             summary = "Продажи товара за день",

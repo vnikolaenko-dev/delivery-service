@@ -2,6 +2,7 @@ package ru.don_polesie.back_end.controller.admin;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,12 +35,26 @@ public class AdminProductManageController {
             description = "Обновление информации о существующем товаре"
     )
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDtoFull> update(@RequestBody @Valid ProductDtoFull productDtoFull,
-                                                 @PathVariable @Min(value = 1) Long id) {
-        ProductDtoFull productDtoFullUpdated = productServiceImpl.findById(id);
+    public ResponseEntity<Void> update(@RequestBody @Valid ProductDtoFull productDtoFull,
+                                       @PathVariable @Min(value = 1) Long id) {
+        productServiceImpl.update(productDtoFull, id);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(productDtoFullUpdated);
+                .build();
+    }
+
+    @Operation(
+            summary = "Обновить скидку",
+            description = "Обновление скидки товара"
+    )
+    @PutMapping("sale/{id}")
+    public ResponseEntity<Void> editSale(
+            @PathVariable @Min(value = 1) Long id,
+            @RequestParam @Min(value = 0) @Max(value = 100) Integer sale) {
+        productServiceImpl.editSale(id, sale);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
     }
 
     @Operation(

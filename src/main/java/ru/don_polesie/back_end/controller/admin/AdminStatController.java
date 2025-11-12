@@ -1,5 +1,6 @@
 package ru.don_polesie.back_end.controller.admin;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,9 @@ public class AdminStatController {
 
     private final AdminStatService adminStatService;
 
+    @Operation(
+            summary = "Дневная выручка"
+    )
     @GetMapping("/daily-revenue")
     public ResponseEntity<RevenueDtoResponse> dailyRevenue(@RequestParam @Min(2025) int year,
                                                            @RequestParam @Min(1) @Max(12) int month,
@@ -28,6 +32,9 @@ public class AdminStatController {
         return ResponseEntity.ok(revenue);
     }
 
+    @Operation(
+            summary = "Месячная выручка"
+    )
     @GetMapping("/monthly-revenue")
     public ResponseEntity<RevenueDtoResponse> monthlyRevenue(@RequestParam @Min(2025) int year,
                                                              @RequestParam @Min(1) @Max(12) int month) {
@@ -35,6 +42,9 @@ public class AdminStatController {
         return ResponseEntity.ok(revenue);
     }
 
+    @Operation(
+            summary = "Товары по популярности"
+    )
     @GetMapping("/most-popular-products")
     public ResponseEntity<Page<PopularProductDtoResponse>> mostPopularProducts(@RequestParam @Min(2025) int year,
                                                                                @RequestParam @Min(1) @Max(12) int month,
@@ -43,6 +53,9 @@ public class AdminStatController {
         return ResponseEntity.ok(products);
     }
 
+    @Operation(
+            summary = "Число заказов за день"
+    )
     @GetMapping("/order-count/per-day")
     public ResponseEntity<Long> orderCountPerDay(@RequestParam @Min(2025) int year,
                                                  @RequestParam @Min(1) @Max(12) int month,
@@ -51,6 +64,9 @@ public class AdminStatController {
         return ResponseEntity.ok(count);
     }
 
+    @Operation(
+            summary = "Число заказов за месяц"
+    )
     @GetMapping("/order-count/per-month")
     public ResponseEntity<Long> orderCountPerMonth(@RequestParam @Min(2025) int year,
                                                    @RequestParam @Min(1) @Max(12) int month) {

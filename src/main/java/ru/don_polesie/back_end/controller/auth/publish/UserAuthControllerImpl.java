@@ -20,6 +20,9 @@ import javax.management.BadAttributeValueExpException;
 public class UserAuthControllerImpl {
     private final UserAuthService userAuthService;
 
+    @Operation(
+            summary = "Отправить пользователю 4-х значный код на номер телефона"
+    )
     @PostMapping("/get-password")
     public ResponseEntity<JwtAuthResponse> getPassword(@RequestParam String phoneNumber) throws BadAttributeValueExpException {
         userAuthService.sendTemporaryPassword(phoneNumber);
@@ -28,6 +31,10 @@ public class UserAuthControllerImpl {
                 .build();
     }
 
+    @Operation(
+            summary = "Проверить временный пароль",
+            description = "Аутентификация пользователя и получение JWT токенов (access + refresh)"
+    )
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> checkPassword(@RequestParam String phoneNumber, @RequestParam String password) throws BadAttributeValueExpException {
         JwtAuthResponse jwtAuthResponse = userAuthService.checkTemporaryPassword(phoneNumber, password);

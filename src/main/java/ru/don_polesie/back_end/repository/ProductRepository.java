@@ -4,6 +4,7 @@ package ru.don_polesie.back_end.repository;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,6 +25,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findAllByAmountGreaterThan(int amount, Pageable pageable);
 
+    Page<Product> findAllBySaleGreaterThan(int i, Pageable pageable);
+
     Optional<ArrayList<Product>> findByBrand(Brand brand);
 
 
@@ -33,7 +36,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "AND  (:name IS NULL OR (LOWER(p.name) LIKE CONCAT('%', LOWER(CAST(:name AS string)), '%')))" +
             "ORDER BY p.id"
     )
-
     Page<Product> findProductsByParams(
             @Param("id") Long id,
             @Param("brand") String brand,
@@ -49,4 +51,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> searchProductsByQuery(@Param("query") String query, Pageable pageable);
 
     Optional<Product> findByBrandAndName(Brand brand, String name);
+
 }

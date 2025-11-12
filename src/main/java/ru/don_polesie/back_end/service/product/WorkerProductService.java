@@ -1,6 +1,9 @@
 package ru.don_polesie.back_end.service.product;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +23,7 @@ import java.math.BigDecimal;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Log4j2
 public class WorkerProductService {
 
     @Value("${utils.page-size}")
@@ -30,6 +34,7 @@ public class WorkerProductService {
     private final CategoryService categoryService;
     private final BrandService brandService;
 
+
     /**
      * Получает страницу с товарами, имеющими ненулевое количество
      *
@@ -37,10 +42,17 @@ public class WorkerProductService {
      * @return страница с товарами в формате DTO
      */
 
-    public Page<ProductDtoFull> findProductsPage(Integer pageNumber) {
+    public Page<ProductDtoFull> findProductsPage(@Min(value = 0) Integer pageNumber) {
         Pageable pageable = createDefaultPageable(pageNumber);
         // только те товары, которые есть в наличии
         return productRepository.findAllByAmountGreaterThan(0, pageable)
+                .map(productMapper::toProductDtoRR);
+    }
+
+    public Page<ProductDtoFull> findProductsPageWithSale(@Min(value = 0) Integer pageNumber) {
+        Pageable pageable = createDefaultPageable(pageNumber);
+        // только те товары, которые со скидкой
+        return productRepository.findAllBySaleGreaterThan(0, pageable)
                 .map(productMapper::toProductDtoRR);
     }
 
@@ -52,7 +64,7 @@ public class WorkerProductService {
      * @throws ObjectNotFoundException если товар не найден
      */
 
-    public ProductDtoFull findById(Long id) {
+    public ProductDtoFull findById(@Min(value = 0) Long id) {
         return productRepository.findById(id)
                 .map(productMapper::toProductDtoRR)
                 .orElseThrow(() -> new ObjectNotFoundException("Product not found with id: " + id));
@@ -66,7 +78,7 @@ public class WorkerProductService {
      * @return страница с найденными товарами
      */
 
-    public Page<ProductDtoFull> findAllByParams(ProductDtoSearchRequest productDtoSearch, Integer pageNumber) {
+    public Page<ProductDtoFull> findAllByParams(ProductDtoSearchRequest productDtoSearch, @Min(value = 0) Integer pageNumber) {
         Pageable pageable = PageRequest.of(pageNumber, PAGE_SIZE);
         return productRepository.findProductsByParams(
                         productDtoSearch.getId(),
@@ -85,43 +97,10 @@ public class WorkerProductService {
      * @return страница с найденными товарами
      */
 
-    public Page<ProductDtoFull> findProductByQuery(String query, Integer pageNumber) {
+    public Page<ProductDtoFull> findProductByQuery(String query, @Min(value = 0) Integer pageNumber) {
         Pageable pageable = createDefaultPageable(pageNumber);
         return productRepository.searchProductsByQuery(query, pageable)
                 .map(productMapper::toProductDtoRR);
-    }
-
-    /**
-     * Обновляет данные товара
-     *
-     * @param productDtoFull новые данные товара
-     * @param id идентификатор обновляемого товара
-     * @return обновленный DTO товара
-     * @throws ObjectNotFoundException если товар не найден
-     */
-
-    @Transactional
-    public ProductDtoFull update(ProductDtoFull productDtoFull, Long id) {
-        Product existingProduct = getProductById(id);
-        checkBrandAndCategory(existingProduct);
-        updateProductFromDto(existingProduct, productDtoFull);
-        Product savedProduct = productRepository.save(existingProduct);
-        return productMapper.toProductDtoRR(savedProduct);
-    }
-
-    /**
-     * Удаляет товар по идентификатору
-     *
-     * @param id идентификатор товара для удаления
-     * @throws ObjectNotFoundException если товар не найден
-     */
-
-    @Transactional
-    public void deleteById(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new ObjectNotFoundException("Product not found with id: " + id);
-        }
-        productRepository.deleteById(id);
     }
 
     /**
@@ -136,8 +115,53 @@ public class WorkerProductService {
         Product newProduct = productMapper.productDtoRRtoProduct(productDtoFull);
         checkBrandAndCategory(newProduct);
         Product savedProduct = productRepository.save(newProduct);
+        log.info("Saved product: {}", savedProduct);
         return productMapper.toProductDtoRR(savedProduct);
     }
+
+    @Transactional
+    public void editSale(@Min(value = 1) Long id, @Min(value = 1) @Max(value = 100) Integer sale) {
+        Product existingProduct = getProductById(id);
+        existingProduct.setSale(sale);
+        log.info("Edited sale for product with id: {} sale:{}", existingProduct.getId(), existingProduct.getSale());
+        productRepository.save(existingProduct);
+    }
+
+    /**
+     * Обновляет данные товара
+     *
+     * @param productDtoFull новые данные товара
+     * @param id идентификатор обновляемого товара
+     * @return обновленный DTO товара
+     * @throws ObjectNotFoundException если товар не найден
+     */
+
+    @Transactional
+    public ProductDtoFull update(ProductDtoFull productDtoFull, @Min(value = 0) Long id) {
+        Product existingProduct = getProductById(id);
+        checkBrandAndCategory(existingProduct);
+        updateProductFromDto(existingProduct, productDtoFull);
+        Product savedProduct = productRepository.save(existingProduct);
+        log.info("Updated product: {}", savedProduct);
+        return productMapper.toProductDtoRR(savedProduct);
+    }
+
+    /**
+     * Удаляет товар по идентификатору
+     *
+     * @param id идентификатор товара для удаления
+     * @throws ObjectNotFoundException если товар не найден
+     */
+
+    @Transactional
+    public void deleteById(@Min(value = 0) Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new ObjectNotFoundException("Product not found with id: " + id);
+        }
+        productRepository.deleteById(id);
+        log.info("Deleted product with id: {}", id);
+    }
+
 
     // ========== ПРИВАТНЫЕ ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========
 
@@ -196,4 +220,5 @@ public class WorkerProductService {
         product.setStorageTemperatureMax(productDtoFull.getStorageTemperatureMax());
         product.setCountryOfOrigin(productDtoFull.getCountryOfOrigin());
     }
+
 }

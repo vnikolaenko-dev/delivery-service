@@ -1,6 +1,7 @@
 package ru.don_polesie.back_end.controller.product.publish;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,9 @@ import java.util.List;
 public class CategorySearchController {
     private CategoryService categoryService;
 
+    @Operation(
+            summary = "Получить список категорий продуктов"
+    )
     @GetMapping
     public ResponseEntity<List<Category>> getBrands(){
         return ResponseEntity.ok(categoryService.findAll());

@@ -41,6 +41,20 @@ public class ProductSearchController {
     }
 
     @Operation(
+            summary = "Получить товары с пагинацией со скидкой",
+            description = "Возвращает страницу с товарами со скидкой"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Список товаров успешно получен")
+    })
+    @GetMapping("/sale")
+    public ResponseEntity<Page<ProductDtoFull>> findProductsPageWithSale(@RequestParam @Min(value = 0) Integer pageNumber) {
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .body(productServiceImpl.findProductsPageWithSale(pageNumber));
+    }
+
+    @Operation(
             summary = "Найти товар по ID",
             description = "Возвращает полную информацию о товаре по его идентификатору"
     )

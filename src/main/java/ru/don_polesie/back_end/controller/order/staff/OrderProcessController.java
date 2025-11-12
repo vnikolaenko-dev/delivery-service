@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.don_polesie.back_end.dto.order.request.ProcessWeightsDtoRequest;
+import ru.don_polesie.back_end.dto.order.request.ProcessQuantitiesDtoRequest;
 import ru.don_polesie.back_end.service.order.WorkerOrderService;
 
 @RestController
@@ -22,7 +22,7 @@ public class OrderProcessController {
     )
     @PostMapping("/{id}/process")
     public ResponseEntity<Void> process(@PathVariable @Min(value = 1) Long id,
-                                        @RequestBody @Valid ProcessWeightsDtoRequest req) {
+                                        @RequestBody @Valid ProcessQuantitiesDtoRequest req) {
         workOrderService.processOrder(id, req);
         return ResponseEntity.ok().build();
     }

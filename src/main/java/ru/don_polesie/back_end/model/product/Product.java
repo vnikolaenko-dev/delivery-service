@@ -123,6 +123,11 @@ public class Product {
     @Size(max = 100, message = "Страна происхождения не может превышать 100 символов")
     private String countryOfOrigin;
 
+    @Column
+    @Min(0)
+    @Max(100)
+    private Integer sale = 0;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
     private Instant createdAt;

@@ -2,6 +2,7 @@ package ru.don_polesie.back_end.service.system;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import java.util.*;
 
 
 @Service
+@Log4j2
 public class YooKassaService {
 
     @Value("${security.YooKassa.shopId}")
@@ -150,16 +152,20 @@ public class YooKassaService {
             if ("succeeded".equals(status)) {
                 order.setStatus(OrderStatus.PAID);
                 orderRepository.save(order);
+                log.info("Money for order {} successfully got", orderId);
             } else if ("waiting_for_capture".equals(status)){
                 order.setStatus(OrderStatus.MONEY_RESERVAITED);
                 orderRepository.save(order);
+                log.info("User paid order {}", orderId);
             } else if ("canceled".equals(status)) {
                 order.setStatus(OrderStatus.CANCELED);
                 orderRepository.save(order);
+                log.info("Something went wrong with order {}", orderId);
             }
 
             return json;
         } else {
+            log.warn("YooKassa getPayment error: {}", response.statusCode() + " " + response.body());
             throw new RuntimeException(
                     "YooKassa getPayment error: " + response.statusCode() + " " + response.body()
             );
