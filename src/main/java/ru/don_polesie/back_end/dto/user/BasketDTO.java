@@ -1,12 +1,11 @@
-package ru.don_polesie.back_end.dto;
+package ru.don_polesie.back_end.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.don_polesie.back_end.dto.order.OrderItemDto;
-import ru.don_polesie.back_end.model.enums.OrderStatus;
 
-import java.time.Instant;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -14,4 +13,5 @@ import java.util.List;
 @AllArgsConstructor
 public class BasketDTO {
     private List<OrderItemDto> items;
+    private BigDecimal totalPrice;
 }

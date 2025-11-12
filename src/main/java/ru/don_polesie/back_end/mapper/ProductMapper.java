@@ -1,7 +1,7 @@
 package ru.don_polesie.back_end.mapper;
 
 import org.mapstruct.*;
-import ru.don_polesie.back_end.dto.product.ProductDtoRR;
+import ru.don_polesie.back_end.dto.product.ProductDtoFull;
 import ru.don_polesie.back_end.dto.product.ProductDtoXML;
 import ru.don_polesie.back_end.model.product.Brand;
 import ru.don_polesie.back_end.model.product.Category;
@@ -12,7 +12,7 @@ public interface ProductMapper {
 
     @Mapping(source = "brand", target = "brand")
     @Mapping(source = "category", target = "category")
-    ProductDtoRR toProductDtoRR(Product product);
+    ProductDtoFull toProductDtoRR(Product product);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "brand", target = "brand")
@@ -23,7 +23,7 @@ public interface ProductMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "brand", target = "brand")
     @Mapping(source = "category", target = "category")
-    Product productDtoRRtoProduct(ProductDtoRR productDtoRR);
+    Product productDtoRRtoProduct(ProductDtoFull productDtoFull);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)

@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.dto;
+package ru.don_polesie.back_end.dto.user;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

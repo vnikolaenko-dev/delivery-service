@@ -4,7 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
-public class ProductDtoRR {
+public class ProductDtoFull {
 
     private Long id;
 

@@ -1,8 +1,8 @@
 package ru.don_polesie.back_end.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.don_polesie.back_end.model.Address;
-import ru.don_polesie.back_end.model.User;
+import ru.don_polesie.back_end.model.user.Address;
+import ru.don_polesie.back_end.model.user.User;
 
 import java.util.List;
 

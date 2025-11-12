@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import ru.don_polesie.back_end.model.User;
+import ru.don_polesie.back_end.model.user.User;
 import ru.don_polesie.back_end.service.staffOnly.StaffService;
 
 @Component

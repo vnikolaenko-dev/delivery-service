@@ -2,14 +2,18 @@ package ru.don_polesie.back_end.model.order;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import ru.don_polesie.back_end.model.Address;
-import ru.don_polesie.back_end.model.User;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import ru.don_polesie.back_end.model.user.Address;
+import ru.don_polesie.back_end.model.user.User;
 import ru.don_polesie.back_end.model.enums.OrderStatus;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,6 +21,8 @@ import java.util.Set;
 @Getter
 @Entity
 @Table(name = "delivery_order")
+@Builder
+@AllArgsConstructor
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,8 +32,10 @@ public class Order {
     @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount;
 
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt = Instant.now();
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Setter
     @Column(name = "phone_number", nullable = false)
@@ -49,7 +57,9 @@ public class Order {
     private User user;
 
     @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt = Instant.now();
+    @UpdateTimestamp
+    @Builder.Default
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("product ASC")
@@ -70,10 +80,4 @@ public class Order {
         orderProducts.remove(op);
         op.setOrder(null);
     }
-
-    @PreUpdate
-    public void preUpdate() {
-        updatedAt = Instant.now();
-    }
-
 }

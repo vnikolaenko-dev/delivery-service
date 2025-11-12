@@ -2,27 +2,30 @@ package ru.don_polesie.back_end.service.order;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.don_polesie.back_end.dto.AddressDTO;
+import ru.don_polesie.back_end.dto.user.AddressDTO;
 import ru.don_polesie.back_end.dto.order.OrderCreateResponse;
 import ru.don_polesie.back_end.dto.order.OrderDtoRR;
 import ru.don_polesie.back_end.dto.order.OrderItemDto;
+import ru.don_polesie.back_end.exceptions.ConflictDataException;
 import ru.don_polesie.back_end.model.basket.Basket;
 import ru.don_polesie.back_end.model.basket.BasketProduct;
 import ru.don_polesie.back_end.model.enums.OrderStatus;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.mapper.AddressMapper;
 import ru.don_polesie.back_end.mapper.OrderMapper;
-import ru.don_polesie.back_end.model.*;
 import ru.don_polesie.back_end.model.order.Order;
 import ru.don_polesie.back_end.model.order.OrderProduct;
 import ru.don_polesie.back_end.model.order.OrderProductId;
 import ru.don_polesie.back_end.model.product.Product;
+import ru.don_polesie.back_end.model.user.Address;
+import ru.don_polesie.back_end.model.user.User;
 import ru.don_polesie.back_end.repository.*;
 import ru.don_polesie.back_end.service.system.YooKassaService;
 
@@ -35,7 +38,11 @@ import java.util.*;
 @Transactional(readOnly = true)
 public class UserOrderService {
 
-    private static final int PAGE_SIZE = 10;
+    @Value("${utils.page-size}")
+    private int PAGE_SIZE;
+
+    @Value("${utils.min-price-for-delivery}")
+    private int MIN_PRICE;
 
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
@@ -123,7 +130,7 @@ public class UserOrderService {
                 .orElseThrow(() -> new ObjectNotFoundException("Basket not found for user: " + user.getPhoneNumber()));
 
         if (basket.getBasketProducts().isEmpty()) {
-            throw new RuntimeException("Basket is empty. Cannot create order.");
+            throw new ObjectNotFoundException("Корзина пустая, невозможно создать заказ.");
         }
 
         // Создаем заказ
@@ -155,6 +162,9 @@ public class UserOrderService {
             ));
 
             orderProducts.add(orderProduct);
+        }
+        if (totalAmount.compareTo(BigDecimal.valueOf(MIN_PRICE)) < 0) {
+            throw new ConflictDataException("Сумма заказа меньше минимальной, закажите товаров на " + (MIN_PRICE - totalAmount.doubleValue()) + "р");
         }
         order.setTotalAmount(totalAmount);
         order.getOrderProducts().addAll(orderProducts);
@@ -226,7 +236,7 @@ public class UserOrderService {
      * Создает объект пагинации
      */
     private Pageable createPageable(Integer pageNumber) {
-        return PageRequest.of(pageNumber - 1, PAGE_SIZE, Sort.by("id").descending());
+        return PageRequest.of(pageNumber, PAGE_SIZE, Sort.by("id").descending());
     }
 
     /**

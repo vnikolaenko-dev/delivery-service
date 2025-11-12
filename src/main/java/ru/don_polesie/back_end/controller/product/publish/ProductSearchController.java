@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.don_polesie.back_end.dto.product.ProductDtoRR;
+import ru.don_polesie.back_end.dto.product.ProductDtoFull;
 import ru.don_polesie.back_end.dto.product.ProductDtoSearch;
 import ru.don_polesie.back_end.service.product.WorkerProductService;
 
@@ -34,7 +34,7 @@ public class ProductSearchController {
             @ApiResponse(responseCode = "200", description = "Список товаров успешно получен")
     })
     @GetMapping
-    public ResponseEntity<Page<ProductDtoRR>> findProductsPage(@RequestParam @Min(value = 0) Integer pageNumber) {
+    public ResponseEntity<Page<ProductDtoFull>> findProductsPage(@RequestParam @Min(value = 0) Integer pageNumber) {
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(productServiceImpl.findProductsPage(pageNumber));
@@ -49,7 +49,7 @@ public class ProductSearchController {
             @ApiResponse(responseCode = "404", description = "Товар не найден")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDtoRR> findById(@PathVariable @Min(value = 1) Long id) {
+    public ResponseEntity<ProductDtoFull> findById(@PathVariable @Min(value = 1) Long id) {
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(productServiceImpl.findById(id));
@@ -64,10 +64,10 @@ public class ProductSearchController {
             @ApiResponse(responseCode = "400", description = "Неверные параметры фильтрации")
     })
     @GetMapping("/find")
-    public ResponseEntity<Page<ProductDtoRR>> findAllByParams(@RequestParam(required = false) Long id,
-                                                              @RequestParam(required = false) String brand,
-                                                              @RequestParam(required = false) String name,
-                                                              @RequestParam(required = false) Integer pageNumber) {
+    public ResponseEntity<Page<ProductDtoFull>> findAllByParams(@RequestParam(required = false) Long id,
+                                                                @RequestParam(required = false) String brand,
+                                                                @RequestParam(required = false) String name,
+                                                                @RequestParam(required = false) Integer pageNumber) {
         ProductDtoSearch productDtoSearch = ProductDtoSearch
                 .builder()
                 .id(id)
@@ -89,8 +89,8 @@ public class ProductSearchController {
             @ApiResponse(responseCode = "400", description = "Пустой или неверный поисковый запрос")
     })
     @GetMapping("/find/query")
-    public ResponseEntity<Page<ProductDtoRR>> findProductsByQuery(@RequestParam String query,
-                                                                  @RequestParam Integer pageNumber) {
+    public ResponseEntity<Page<ProductDtoFull>> findProductsByQuery(@RequestParam String query,
+                                                                    @RequestParam Integer pageNumber) {
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(productServiceImpl.findProductByQuery(query, pageNumber));

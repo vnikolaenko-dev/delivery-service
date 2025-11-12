@@ -11,7 +11,6 @@ import java.util.List;
 @XmlRootElement(name = "Products")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ProductListDtoXML {
-
     @XmlElement(name = "Product")
     private List<ProductDtoXML> products;
 

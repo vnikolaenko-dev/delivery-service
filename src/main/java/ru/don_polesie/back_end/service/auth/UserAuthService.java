@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
 import ru.don_polesie.back_end.exceptions.RequestValidationException;
 import ru.don_polesie.back_end.model.Role;
-import ru.don_polesie.back_end.model.User;
+import ru.don_polesie.back_end.model.user.User;
 import ru.don_polesie.back_end.model.basket.Basket;
 import ru.don_polesie.back_end.repository.BasketRepository;
 import ru.don_polesie.back_end.repository.RoleRepository;

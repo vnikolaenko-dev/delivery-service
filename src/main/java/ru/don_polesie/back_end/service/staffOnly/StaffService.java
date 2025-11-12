@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
-import ru.don_polesie.back_end.model.User;
+import ru.don_polesie.back_end.model.user.User;
 import ru.don_polesie.back_end.repository.UserRepository;
 
 

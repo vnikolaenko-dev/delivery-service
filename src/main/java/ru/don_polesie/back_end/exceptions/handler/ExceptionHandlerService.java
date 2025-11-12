@@ -70,6 +70,7 @@ public class ExceptionHandlerService {
         );
     }
 
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Information> handleException(Exception ex, WebRequest request) {
         log.error("Internal error - URL: {}, Error: {}", request.getDescription(false), ex.getMessage(), ex);

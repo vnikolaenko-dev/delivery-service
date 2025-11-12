@@ -23,10 +23,9 @@ public class PriceService {
 
         if (Boolean.TRUE.equals(product.getIsWeighted())) {
             // Для весового товара: (количество_грамм / 1000) * цена_за_кг
-            double pricePerKg = product.getPrice();
-            double costValue = ((double) quantity / 1000) * pricePerKg;
-            cost = BigDecimal.valueOf(costValue);
-        } else cost = BigDecimal.valueOf(product.getPrice() * quantity);
+            BigDecimal pricePerKg = product.getPrice();
+            cost = BigDecimal.valueOf(quantity / 1000).multiply(pricePerKg);
+        } else cost = product.getPrice().multiply(BigDecimal.valueOf(quantity));
         // Округление до 2 знаков после запятой
         return cost.setScale(2, RoundingMode.HALF_UP);
     }

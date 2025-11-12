@@ -38,6 +38,17 @@ public class OrderProcessController {
     }
 
     @Operation(
+            summary = "Удалить заказ",
+            description = "Полное удаление заказа из системы (административная функция)"
+    )
+    @DeleteMapping("/{order_id}/{product_id}")
+    public ResponseEntity<Void> deleteProductFromOrder(@PathVariable @Min(value = 1) Long order_id,
+                                       @PathVariable @Min(value = 1) Long product_id) {
+        workOrderService.deleteProductFromOrder(order_id, product_id);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
             summary = "Отметить как отправленный",
             description = "Изменение статуса заказа на 'отправлен' после комплектации"
     )

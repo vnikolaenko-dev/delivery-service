@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.don_polesie.back_end.dto.product.ProductDtoRR;
+import ru.don_polesie.back_end.dto.product.ProductDtoFull;
 import ru.don_polesie.back_end.service.product.WorkerProductService;
 
 @RestController
@@ -22,11 +22,11 @@ public class ProductControllerImpl {
             description = "Создание нового товара в каталоге"
     )
     @PostMapping
-    public ResponseEntity<ProductDtoRR> save(@RequestBody @Valid ProductDtoRR productDtoRR) {
-        ProductDtoRR newProductDtoRR = productServiceImpl.save(productDtoRR);
+    public ResponseEntity<ProductDtoFull> save(@RequestBody @Valid ProductDtoFull productDtoFull) {
+        ProductDtoFull newProductDtoFull = productServiceImpl.save(productDtoFull);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(newProductDtoRR);
+                .body(newProductDtoFull);
     }
 
     @Operation(
@@ -34,12 +34,12 @@ public class ProductControllerImpl {
             description = "Обновление информации о существующем товаре"
     )
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDtoRR> update(@RequestBody @Valid ProductDtoRR productDtoRR,
-                                               @PathVariable @Min(value = 1) Long id) {
-        ProductDtoRR productDtoRRUpdated = productServiceImpl.findById(id);
+    public ResponseEntity<ProductDtoFull> update(@RequestBody @Valid ProductDtoFull productDtoFull,
+                                                 @PathVariable @Min(value = 1) Long id) {
+        ProductDtoFull productDtoFullUpdated = productServiceImpl.findById(id);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(productDtoRRUpdated);
+                .body(productDtoFullUpdated);
     }
 
     @Operation(

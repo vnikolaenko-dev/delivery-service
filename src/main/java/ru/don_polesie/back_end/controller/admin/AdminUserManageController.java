@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.don_polesie.back_end.dto.UserDTO;
+import ru.don_polesie.back_end.dto.user.UserDTO;
 import ru.don_polesie.back_end.service.staffOnly.AdminService;
 
 @RestController

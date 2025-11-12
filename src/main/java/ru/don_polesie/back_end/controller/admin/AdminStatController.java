@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.don_polesie.back_end.dto.RevenueDto;
+import ru.don_polesie.back_end.dto.admin.RevenueDto;
 import ru.don_polesie.back_end.dto.order.PopularProductDto;
 import ru.don_polesie.back_end.service.admin.AdminStatService;
 

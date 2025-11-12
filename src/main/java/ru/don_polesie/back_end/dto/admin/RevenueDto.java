@@ -1,11 +1,11 @@
-package ru.don_polesie.back_end.dto.order;
+package ru.don_polesie.back_end.dto.admin;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class OrderCountDto {
-    private Long count;
+public class RevenueDto {
+    private Long revenue;
     private String period;
 }

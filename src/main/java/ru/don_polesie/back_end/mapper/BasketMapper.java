@@ -3,7 +3,7 @@ package ru.don_polesie.back_end.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-import ru.don_polesie.back_end.dto.BasketDTO;
+import ru.don_polesie.back_end.dto.user.BasketDTO;
 import ru.don_polesie.back_end.dto.order.OrderItemDto;
 import ru.don_polesie.back_end.model.basket.Basket;
 import ru.don_polesie.back_end.model.basket.BasketProduct;

@@ -10,8 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.don_polesie.back_end.dto.order.OrderCreateResponse;
-import ru.don_polesie.back_end.model.Address;
-import ru.don_polesie.back_end.model.User;
+import ru.don_polesie.back_end.model.user.User;
 import ru.don_polesie.back_end.security.SecurityUtils;
 import ru.don_polesie.back_end.service.order.UserOrderService;
 

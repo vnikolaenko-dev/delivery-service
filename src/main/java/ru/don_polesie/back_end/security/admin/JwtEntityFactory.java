@@ -5,7 +5,7 @@ package ru.don_polesie.back_end.security.admin;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import ru.don_polesie.back_end.model.Role;
-import ru.don_polesie.back_end.model.User;
+import ru.don_polesie.back_end.model.user.User;
 
 import java.util.ArrayList;
 import java.util.List;

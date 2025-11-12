@@ -1,25 +1,29 @@
 package ru.don_polesie.back_end.service.product;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.don_polesie.back_end.dto.product.ProductDtoRR;
+import ru.don_polesie.back_end.dto.product.ProductDtoFull;
 import ru.don_polesie.back_end.dto.product.ProductDtoSearch;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.mapper.ProductMapper;
 import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.ProductRepository;
 
+import java.math.BigDecimal;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class WorkerProductService {
 
-    private static final int PAGE_SIZE = 10;
+    @Value("${utils.page-size}")
+    private static int PAGE_SIZE;
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
@@ -33,7 +37,7 @@ public class WorkerProductService {
      * @return страница с товарами в формате DTO
      */
 
-    public Page<ProductDtoRR> findProductsPage(Integer pageNumber) {
+    public Page<ProductDtoFull> findProductsPage(Integer pageNumber) {
         Pageable pageable = createDefaultPageable(pageNumber);
         return productRepository.findAllByAmountGreaterThan(0, pageable)
                 .map(productMapper::toProductDtoRR);
@@ -47,7 +51,7 @@ public class WorkerProductService {
      * @throws ObjectNotFoundException если товар не найден
      */
 
-    public ProductDtoRR findById(Long id) {
+    public ProductDtoFull findById(Long id) {
         return productRepository.findById(id)
                 .map(productMapper::toProductDtoRR)
                 .orElseThrow(() -> new ObjectNotFoundException("Product not found with id: " + id));
@@ -61,7 +65,7 @@ public class WorkerProductService {
      * @return страница с найденными товарами
      */
 
-    public Page<ProductDtoRR> findAllByParams(ProductDtoSearch productDtoSearch, Integer pageNumber) {
+    public Page<ProductDtoFull> findAllByParams(ProductDtoSearch productDtoSearch, Integer pageNumber) {
         Pageable pageable = PageRequest.of(pageNumber, PAGE_SIZE);
         return productRepository.findProductsByParams(
                         productDtoSearch.getId(),
@@ -80,7 +84,7 @@ public class WorkerProductService {
      * @return страница с найденными товарами
      */
 
-    public Page<ProductDtoRR> findProductByQuery(String query, Integer pageNumber) {
+    public Page<ProductDtoFull> findProductByQuery(String query, Integer pageNumber) {
         Pageable pageable = createDefaultPageable(pageNumber);
         return productRepository.searchProductsByQuery(query, pageable)
                 .map(productMapper::toProductDtoRR);
@@ -89,17 +93,17 @@ public class WorkerProductService {
     /**
      * Обновляет данные товара
      *
-     * @param productDtoRR новые данные товара
+     * @param productDtoFull новые данные товара
      * @param id идентификатор обновляемого товара
      * @return обновленный DTO товара
      * @throws ObjectNotFoundException если товар не найден
      */
 
     @Transactional
-    public ProductDtoRR update(ProductDtoRR productDtoRR, Long id) {
+    public ProductDtoFull update(ProductDtoFull productDtoFull, Long id) {
         Product existingProduct = getProductById(id);
         checkBrandAndCategory(existingProduct);
-        updateProductFromDto(existingProduct, productDtoRR);
+        updateProductFromDto(existingProduct, productDtoFull);
         Product savedProduct = productRepository.save(existingProduct);
         return productMapper.toProductDtoRR(savedProduct);
     }
@@ -122,13 +126,13 @@ public class WorkerProductService {
     /**
      * Сохраняет новый товар
      *
-     * @param productDtoRR DTO с данными нового товара
+     * @param productDtoFull DTO с данными нового товара
      * @return сохраненный DTO товара
      */
 
     @Transactional
-    public ProductDtoRR save(ProductDtoRR productDtoRR) {
-        Product newProduct = productMapper.productDtoRRtoProduct(productDtoRR);
+    public ProductDtoFull save(ProductDtoFull productDtoFull) {
+        Product newProduct = productMapper.productDtoRRtoProduct(productDtoFull);
         checkBrandAndCategory(newProduct);
         Product savedProduct = productRepository.save(newProduct);
         return productMapper.toProductDtoRR(savedProduct);
@@ -174,21 +178,21 @@ public class WorkerProductService {
      * Обновляет поля товара из DTO
      *
      * @param product сущность товара для обновления
-     * @param productDtoRR DTO с новыми значениями полей
+     * @param productDtoFull DTO с новыми значениями полей
      */
-    private void updateProductFromDto(Product product, ProductDtoRR productDtoRR) {
+    private void updateProductFromDto(Product product, ProductDtoFull productDtoFull) {
         // product.setBrand(new Brand(productDtoRR.getBrand()));
-        product.setName(productDtoRR.getName());
-        product.setPrice(productDtoRR.getPrice());
-        product.setImageUrl(productDtoRR.getImageUrl());
-        product.setFatGrams(productDtoRR.getFatGrams());
-        product.setProteinGrams(productDtoRR.getProteinGrams());
-        product.setCarbohydrateGrams(productDtoRR.getCarbohydrateGrams());
-        product.setEnergyKcalPer100g(productDtoRR.getEnergyKcalPer100g());
-        product.setMinWeight(productDtoRR.getMinWeight());
-        product.setMaxWeight(productDtoRR.getMaxWeight());
-        product.setStorageTemperatureMin(productDtoRR.getStorageTemperatureMin());
-        product.setStorageTemperatureMax(productDtoRR.getStorageTemperatureMax());
-        product.setCountryOfOrigin(productDtoRR.getCountryOfOrigin());
+        product.setName(productDtoFull.getName());
+        product.setPrice(BigDecimal.valueOf(productDtoFull.getPrice()));
+        product.setImageUrl(productDtoFull.getImageUrl());
+        product.setFatGrams(BigDecimal.valueOf(productDtoFull.getFatGrams()));
+        product.setProteinGrams(BigDecimal.valueOf(productDtoFull.getProteinGrams()));
+        product.setCarbohydrateGrams(BigDecimal.valueOf(productDtoFull.getCarbohydrateGrams()));
+        product.setEnergyKcalPer100g(BigDecimal.valueOf(productDtoFull.getEnergyKcalPer100g()));
+        product.setMinWeight(productDtoFull.getMinWeight());
+        product.setMaxWeight(productDtoFull.getMaxWeight());
+        product.setStorageTemperatureMin(productDtoFull.getStorageTemperatureMin());
+        product.setStorageTemperatureMax(productDtoFull.getStorageTemperatureMax());
+        product.setCountryOfOrigin(productDtoFull.getCountryOfOrigin());
     }
 }

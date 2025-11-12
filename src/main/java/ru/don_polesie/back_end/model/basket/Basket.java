@@ -1,17 +1,12 @@
 package ru.don_polesie.back_end.model.basket;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import ru.don_polesie.back_end.model.Address;
-import ru.don_polesie.back_end.model.User;
-import ru.don_polesie.back_end.model.enums.OrderStatus;
-import ru.don_polesie.back_end.model.order.OrderProduct;
+import ru.don_polesie.back_end.model.user.User;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 

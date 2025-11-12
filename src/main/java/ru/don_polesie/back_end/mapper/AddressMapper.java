@@ -3,8 +3,8 @@ package ru.don_polesie.back_end.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import ru.don_polesie.back_end.dto.AddressDTO;
-import ru.don_polesie.back_end.model.Address;
+import ru.don_polesie.back_end.dto.user.AddressDTO;
+import ru.don_polesie.back_end.model.user.Address;
 
 import java.util.List;
 

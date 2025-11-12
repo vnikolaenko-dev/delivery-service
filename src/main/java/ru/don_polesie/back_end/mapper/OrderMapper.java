@@ -22,13 +22,14 @@ public interface OrderMapper {
     @Mapping(target = "orderProducts", ignore = true)
     Order toOrder(OrderDtoRR orderDtoRR);
 
-
     @Named("mapItems")
     default List<OrderItemDto> mapItems(Set<OrderProduct> ops) {
         return ops.stream()
                 .map(op -> new OrderItemDto(
                         op.getProduct().getId(),
-                        op.getQuantity())
+                        op.getProduct().getName(),
+                        op.getQuantity(),
+                        op.getProduct().getPrice())
                 )
                 .collect(Collectors.toList());
     }

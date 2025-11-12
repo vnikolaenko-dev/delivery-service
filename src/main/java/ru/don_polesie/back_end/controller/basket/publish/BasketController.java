@@ -5,16 +5,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
-import org.springdoc.core.service.SecurityService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.don_polesie.back_end.dto.BasketDTO;
+import ru.don_polesie.back_end.dto.user.BasketDTO;
 import ru.don_polesie.back_end.mapper.BasketMapper;
-import ru.don_polesie.back_end.model.User;
-import ru.don_polesie.back_end.model.basket.Basket;
+import ru.don_polesie.back_end.mapper.ProductMapper;
+import ru.don_polesie.back_end.model.user.User;
 import ru.don_polesie.back_end.security.SecurityUtils;
 import ru.don_polesie.back_end.service.basket.BasketService;
+import ru.don_polesie.back_end.service.order.PriceService;
+import ru.don_polesie.back_end.service.product.WorkerProductService;
+
+import java.math.BigDecimal;
 
 @RequestMapping("/api/basket")
 @AllArgsConstructor
@@ -23,12 +25,25 @@ public class BasketController {
     private final BasketService basketService;
     private final SecurityUtils securityUtils;
     private final BasketMapper basketMapper;
+    private final WorkerProductService workerProductService;
+    private final PriceService priceService;
+    private final ProductMapper productMapper;
 
     @GetMapping
     public ResponseEntity<BasketDTO> getBasket() {
         User user = securityUtils.getCurrentUser();
         var resp = basketService.getBasket(user.getPhoneNumber());
         BasketDTO dto = basketMapper.toDto(resp);
+        dto.setTotalPrice(BigDecimal.ZERO);
+        dto.getItems().forEach(
+                orderItemDto -> {
+                    var productRR = workerProductService.findById(orderItemDto.getProductId());
+                    var product = productMapper.productDtoRRtoProduct(productRR);
+                    orderItemDto.setPrice(product.getPrice());
+                    orderItemDto.setProductName(product.getName());
+                    dto.setTotalPrice(dto.getTotalPrice().add(priceService.calculateProductCost(product, orderItemDto.getQuantity())));
+                }
+        );
         return ResponseEntity.ok(dto);
     }
 
@@ -38,13 +53,12 @@ public class BasketController {
             description = "Для не весовых товаров по дефолту - 1"
     )
     @GetMapping("/add")
-    public ResponseEntity<BasketDTO> addProduct(
+    public ResponseEntity<Void> addProduct(
             @RequestParam @Min(value = 1) Long productId,
             @RequestParam (defaultValue = "1") @Min(value = 1) int quantity) {
         User user = securityUtils.getCurrentUser();
-        var resp = basketService.addProduct(user.getPhoneNumber(), productId, quantity);
-        BasketDTO dto = basketMapper.toDto(resp);
-        return ResponseEntity.ok(dto);
+        basketService.addProduct(user.getPhoneNumber(), productId, quantity);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(
@@ -57,12 +71,11 @@ public class BasketController {
             @ApiResponse(responseCode = "404", description = "Товар или адрес не найден")
     })
     @GetMapping("/change-quantity")
-    public ResponseEntity<BasketDTO> changeProductQuantity(@RequestParam @Min(value = 1) Long productId,
+    public ResponseEntity<Void> changeProductQuantity(@RequestParam @Min(value = 1) Long productId,
                                                         @RequestParam @Min(value = 1) int quantity) {
         User user = securityUtils.getCurrentUser();
-        var resp = basketService.changeQuantityProduct(user.getPhoneNumber(), productId, quantity);
-        BasketDTO dto = basketMapper.toDto(resp);
-        return ResponseEntity.ok(dto);
+        basketService.changeQuantityProduct(user.getPhoneNumber(), productId, quantity);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(
@@ -75,10 +88,9 @@ public class BasketController {
             @ApiResponse(responseCode = "404", description = "Заказ или товар не найден")
     })
     @DeleteMapping("/product")
-    public ResponseEntity<BasketDTO> deleteProductFromOrder(@RequestParam @Min(value = 1) Long productId) {
+    public ResponseEntity<Void> deleteProductFromOrder(@RequestParam @Min(value = 1) Long productId) {
         User user = securityUtils.getCurrentUser();
-        var resp = basketService.deleteProductFromBasket(user.getPhoneNumber(), productId);
-        BasketDTO dto = basketMapper.toDto(resp);
-        return ResponseEntity.ok(dto);
+        basketService.deleteProductFromBasket(user.getPhoneNumber(), productId);
+        return ResponseEntity.ok().build();
     }
 }

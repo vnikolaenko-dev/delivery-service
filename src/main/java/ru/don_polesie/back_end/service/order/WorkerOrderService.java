@@ -1,6 +1,8 @@
 package ru.don_polesie.back_end.service.order;
 
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,11 +25,14 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class WorkerOrderService {
-    private static final int PAGE_SIZE = 10;
+    @Value("${utils.page-size}")
+    private static int PAGE_SIZE;
 
     private final OrderRepository orderRepository;
     private final OrderProductRepository orderProductRepository;
@@ -38,7 +43,7 @@ public class WorkerOrderService {
 
 
     public OrderDtoRR findById(Long id) {
-        Order order = orderRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Order not found"));
+        Order order = orderRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Заказ не найден"));
         return orderMapper.toOrderDtoRR(order);
     }
 
@@ -78,6 +83,9 @@ public class WorkerOrderService {
     @Transactional
     public void markShipped(Long id) {
         Order order = getOrderById(id);
+        if (!order.getStatus().equals(OrderStatus.READY_FOR_DELIVERY)) {
+            throw new IllegalArgumentException("Заказ не был собран");
+        }
         order.setStatus(OrderStatus.SHIPPED);
         orderRepository.save(order);
     }
@@ -95,7 +103,7 @@ public class WorkerOrderService {
     public void processOrder(Long id, ProcessWeightsRequest request) {
         Order order = getOrderById(id);
         if (!OrderStatus.MONEY_RESERVAITED.equals(order.getStatus())) {
-            throw new IllegalArgumentException("Order status is not MONEY_RESERVAITED");
+            throw new IllegalArgumentException("Деньги не зарезервированны, заказ нельзя обработать");
         }
         Map<Long, ProcessWeightsRequest.WeightDto> weightMap = createWeightMap(request);
 
@@ -103,6 +111,21 @@ public class WorkerOrderService {
         updateOrderPayment(order, newTotal);
 
         orderRepository.save(order);
+    }
+
+    public void deleteProductFromOrder(Long orderId, Long productId) {
+        Order order = getOrderById(orderId);
+        if (!OrderStatus.MONEY_RESERVAITED.equals(order.getStatus())) {
+            throw new IllegalArgumentException("Деньги не зарезервированны, заказ нельзя обработать");
+        }
+
+        for(OrderProduct orderProduct : order.getOrderProducts()) {
+            if (orderProduct.getId().getProductId().equals(productId)) {
+                orderProductRepository.delete(orderProduct);
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Такого товара нет в заказе");
     }
 
     /**
@@ -250,4 +273,5 @@ public class WorkerOrderService {
             order.setStatus(OrderStatus.ERROR_ON_PAYMENT);
         }
     }
+
 }
