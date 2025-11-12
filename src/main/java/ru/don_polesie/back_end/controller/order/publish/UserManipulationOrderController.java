@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.don_polesie.back_end.dto.order.OrderCreateResponse;
+import ru.don_polesie.back_end.dto.order.response.OrderCreatedDtoResponse;
 import ru.don_polesie.back_end.model.user.User;
 import ru.don_polesie.back_end.security.SecurityUtils;
 import ru.don_polesie.back_end.service.order.UserOrderService;
@@ -36,7 +36,7 @@ public class UserManipulationOrderController {
             @ApiResponse(responseCode = "404", description = "Товар или адрес не найден")
     })
     @PostMapping
-    public ResponseEntity<OrderCreateResponse> save(@RequestParam @Min(value = 1) Long addressId) {
+    public ResponseEntity<OrderCreatedDtoResponse> save(@RequestParam @Min(value = 1) Long addressId) {
         User user = securityUtils.getCurrentUser();
         var resp = orderServiceImpl.save(user, addressId);
         return ResponseEntity

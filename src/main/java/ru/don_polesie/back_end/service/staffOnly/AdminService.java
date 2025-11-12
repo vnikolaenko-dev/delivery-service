@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.don_polesie.back_end.dto.user.UserDTO;
+import ru.don_polesie.back_end.dto.user.UserDtoResponse;
 import ru.don_polesie.back_end.model.user.User;
 import ru.don_polesie.back_end.repository.UserRepository;
 
@@ -30,7 +30,7 @@ public class AdminService {
      * @return страница с пользователями в формате DTO
      */
 
-    public Page<UserDTO> findUsersPage(Integer pageNumber) {
+    public Page<UserDtoResponse> findUsersPage(Integer pageNumber) {
         Pageable pageable = createDefaultPageable(pageNumber);
         Page<User> usersPage = userRepository.findByRolesName(USER_ROLE_NAME, pageable);
         return usersPage.map(this::toDTO);
@@ -43,7 +43,7 @@ public class AdminService {
      * @return страница с работниками в формате DTO
      */
 
-    public Page<UserDTO> findWorkersPage(Integer pageNumber) {
+    public Page<UserDtoResponse> findWorkersPage(Integer pageNumber) {
         Pageable pageable = createDefaultPageable(pageNumber);
         Page<User> workersPage = userRepository.findByRolesName(WORKER_ROLE_NAME, pageable);
         return workersPage.map(this::toDTO);
@@ -62,16 +62,16 @@ public class AdminService {
     /**
      * Создает нового пользователя
      *
-     * @param userDTO данные пользователя для создания
+     * @param userDtoResponse данные пользователя для создания
      */
 
-    public void createUser(UserDTO userDTO) {
-        User user = createUserFromDTO(userDTO);
+    public void createUser(UserDtoResponse userDtoResponse) {
+        User user = createUserFromDTO(userDtoResponse);
         userRepository.save(user);
     }
 
-    public void updateUser(UserDTO userDTO) {
-        User user = createUserFromDTO(userDTO);
+    public void updateUser(UserDtoResponse userDtoResponse) {
+        User user = createUserFromDTO(userDtoResponse);
         userRepository.save(user);
     }
 
@@ -94,8 +94,8 @@ public class AdminService {
      * @param user сущность пользователя
      * @return DTO пользователя
      */
-    private UserDTO toDTO(User user) {
-        UserDTO dto = new UserDTO();
+    private UserDtoResponse toDTO(User user) {
+        UserDtoResponse dto = new UserDtoResponse();
         dto.id = user.getId().intValue();
         dto.name = user.getName();
         dto.surname = user.getSurname();
@@ -108,18 +108,18 @@ public class AdminService {
     /**
      * Создает сущность User из DTO с шифрованием пароля
      *
-     * @param userDTO DTO с данными пользователя
+     * @param userDtoResponse DTO с данными пользователя
      * @return сущность User с зашифрованным паролем
      */
-    private User createUserFromDTO(UserDTO userDTO) {
-        String password = userDTO.getPassword();
+    private User createUserFromDTO(UserDtoResponse userDtoResponse) {
+        String password = userDtoResponse.getPassword();
         return User.builder()
-                .name(userDTO.getName())
-                .surname(userDTO.getSurname())
-                .email(userDTO.getEmail())
-                .phoneNumber(userDTO.getPhoneNumber())
+                .name(userDtoResponse.getName())
+                .surname(userDtoResponse.getSurname())
+                .email(userDtoResponse.getEmail())
+                .phoneNumber(userDtoResponse.getPhoneNumber())
                 .password(passwordEncoder.encode(password))
-                .roles(userDTO.getRoles())
+                .roles(userDtoResponse.getRoles())
                 .build();
     }
 }

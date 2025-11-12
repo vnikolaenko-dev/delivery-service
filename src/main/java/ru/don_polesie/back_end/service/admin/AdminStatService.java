@@ -6,8 +6,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.don_polesie.back_end.dto.admin.RevenueDto;
-import ru.don_polesie.back_end.dto.order.PopularProductDto;
+import ru.don_polesie.back_end.dto.admin.RevenueDtoResponse;
+import ru.don_polesie.back_end.dto.order.response.PopularProductDtoResponse;
 import ru.don_polesie.back_end.repository.OrderProductRepository;
 import ru.don_polesie.back_end.repository.OrderRepository;
 
@@ -26,33 +26,33 @@ public class AdminStatService {
     private ZoneId zone = ZoneId.of("Europe/Moscow");
 
 
-    public RevenueDto getDailyRevenue(int year, int month, int day) {
+    public RevenueDtoResponse getDailyRevenue(int year, int month, int day) {
         LocalDate date = LocalDate.of(year, month, day);
-        Instant startOfDay = date.atStartOfDay(ZoneOffset.of("Europe/Moscow")).toInstant();
-        Instant endOfDay = date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+        LocalDateTime startOfDay = date.atStartOfDay(ZoneOffset.of("Europe/Moscow")).toLocalDateTime();
+        LocalDateTime endOfDay = date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toLocalDateTime();
 
 
         String period = String.format("%d-%02d-%02d", year, month, day);
         BigDecimal revenue = orderRepository.calculateRevenueByPeriod(startOfDay, endOfDay);
-        return new RevenueDto(revenue != null ? revenue.longValue() : 0, period);
+        return new RevenueDtoResponse(revenue != null ? revenue.longValue() : 0, period);
     }
 
 
-    public RevenueDto getMonthlyRevenue(int year, int month) {
+    public RevenueDtoResponse getMonthlyRevenue(int year, int month) {
         YearMonth yearMonth = YearMonth.of(year, month);
-        Instant startOfMonth = yearMonth.atDay(1).atStartOfDay(zone).toInstant();
-        Instant endOfMonth = yearMonth.atEndOfMonth().plusDays(1).atStartOfDay(zone).toInstant();
+        LocalDateTime startOfMonth = yearMonth.atDay(1).atStartOfDay(zone).toLocalDateTime();
+        LocalDateTime endOfMonth = yearMonth.atEndOfMonth().plusDays(1).atStartOfDay(zone).toLocalDateTime();
 
         String period = String.format("%d-%02d", year, month);
         BigDecimal revenue = orderRepository.calculateRevenueByPeriod(startOfMonth, endOfMonth);
-        return new RevenueDto(revenue != null ? revenue.longValue() : 0, period);
+        return new RevenueDtoResponse(revenue != null ? revenue.longValue() : 0, period);
     }
 
 
-    public Page<PopularProductDto> getMostPopularProducts(int year, int month, int pageNumber) {
+    public Page<PopularProductDtoResponse> getMostPopularProducts(int year, int month, int pageNumber) {
         YearMonth yearMonth = YearMonth.of(year, month);
-        Instant startOfMonth = yearMonth.atDay(1).atStartOfDay(zone).toInstant();
-        Instant endOfMonth = yearMonth.atEndOfMonth().plusDays(1).atStartOfDay(zone).toInstant();
+        LocalDateTime startOfMonth = yearMonth.atDay(1).atStartOfDay(zone).toLocalDateTime();
+        LocalDateTime endOfMonth = yearMonth.atEndOfMonth().plusDays(1).atStartOfDay(zone).toLocalDateTime();
 
         Pageable pageable = PageRequest.of(pageNumber, 10);
 
@@ -62,8 +62,8 @@ public class AdminStatService {
 
     public Long getOrderCountPerDay(int year, int month, int day) {
         LocalDate date = LocalDate.of(year, month, day);
-        Instant startOfDay = date.atStartOfDay(zone).toInstant();
-        Instant endOfDay = date.plusDays(1).atStartOfDay(zone).toInstant();
+        LocalDateTime startOfDay = date.atStartOfDay(zone).toLocalDateTime();
+        LocalDateTime endOfDay = date.plusDays(1).atStartOfDay(zone).toLocalDateTime();
 
         return orderRepository.countByCreatedAtBetween(startOfDay, endOfDay);
     }
@@ -71,8 +71,8 @@ public class AdminStatService {
 
     public Long getOrderCountPerMonth(int year, int month) {
         YearMonth yearMonth = YearMonth.of(year, month);
-        Instant startOfMonth = yearMonth.atDay(1).atStartOfDay(zone).toInstant();
-        Instant endOfMonth = yearMonth.atEndOfMonth().plusDays(1).atStartOfDay(zone).toInstant();
+        LocalDateTime startOfMonth = yearMonth.atDay(1).atStartOfDay(zone).toLocalDateTime();
+        LocalDateTime endOfMonth = yearMonth.atEndOfMonth().plusDays(1).atStartOfDay(zone).toLocalDateTime();
 
         return orderRepository.countByCreatedAtBetween(startOfMonth, endOfMonth);
     }

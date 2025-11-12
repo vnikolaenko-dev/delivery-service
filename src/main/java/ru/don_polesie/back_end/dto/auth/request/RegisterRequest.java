@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.dto.auth;
+package ru.don_polesie.back_end.dto.auth.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

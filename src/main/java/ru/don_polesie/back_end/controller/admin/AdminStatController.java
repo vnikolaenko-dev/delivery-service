@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.don_polesie.back_end.dto.admin.RevenueDto;
-import ru.don_polesie.back_end.dto.order.PopularProductDto;
+import ru.don_polesie.back_end.dto.admin.RevenueDtoResponse;
+import ru.don_polesie.back_end.dto.order.response.PopularProductDtoResponse;
 import ru.don_polesie.back_end.service.admin.AdminStatService;
 
 @RestController
@@ -21,25 +21,25 @@ public class AdminStatController {
     private final AdminStatService adminStatService;
 
     @GetMapping("/daily-revenue")
-    public ResponseEntity<RevenueDto> dailyRevenue(@RequestParam @Min(2025) int year,
-                                                   @RequestParam @Min(1) @Max(12) int month,
-                                                   @RequestParam @Min(1) @Max(31) int day) {
-        RevenueDto revenue = adminStatService.getDailyRevenue(year, month, day);
+    public ResponseEntity<RevenueDtoResponse> dailyRevenue(@RequestParam @Min(2025) int year,
+                                                           @RequestParam @Min(1) @Max(12) int month,
+                                                           @RequestParam @Min(1) @Max(31) int day) {
+        RevenueDtoResponse revenue = adminStatService.getDailyRevenue(year, month, day);
         return ResponseEntity.ok(revenue);
     }
 
     @GetMapping("/monthly-revenue")
-    public ResponseEntity<RevenueDto> monthlyRevenue(@RequestParam @Min(2025) int year,
-                                                     @RequestParam @Min(1) @Max(12) int month) {
-        RevenueDto revenue = adminStatService.getMonthlyRevenue(year, month);
+    public ResponseEntity<RevenueDtoResponse> monthlyRevenue(@RequestParam @Min(2025) int year,
+                                                             @RequestParam @Min(1) @Max(12) int month) {
+        RevenueDtoResponse revenue = adminStatService.getMonthlyRevenue(year, month);
         return ResponseEntity.ok(revenue);
     }
 
     @GetMapping("/most-popular-products")
-    public ResponseEntity<Page<PopularProductDto>> mostPopularProducts(@RequestParam @Min(2025) int year,
-                                                                       @RequestParam @Min(1) @Max(12) int month,
-                                                                       @RequestParam int pageNumber) {
-        Page<PopularProductDto> products = adminStatService.getMostPopularProducts(year, month, pageNumber);
+    public ResponseEntity<Page<PopularProductDtoResponse>> mostPopularProducts(@RequestParam @Min(2025) int year,
+                                                                               @RequestParam @Min(1) @Max(12) int month,
+                                                                               @RequestParam int pageNumber) {
+        Page<PopularProductDtoResponse> products = adminStatService.getMostPopularProducts(year, month, pageNumber);
         return ResponseEntity.ok(products);
     }
 

@@ -6,17 +6,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.don_polesie.back_end.dto.order.PopularProductDto;
+import ru.don_polesie.back_end.dto.order.response.PopularProductDtoResponse;
 import ru.don_polesie.back_end.model.order.OrderProduct;
 import ru.don_polesie.back_end.model.order.OrderProductId;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Repository
 public interface OrderProductRepository extends JpaRepository<OrderProduct, OrderProductId> {
 
     @Query("""
-        SELECT new ru.don_polesie.back_end.dto.order.PopularProductDto(
+        SELECT new ru.don_polesie.back_end.dto.order.response.PopularProductDtoResponse(
             p.id,
             p.name,
             SUM(op.quantity),
@@ -30,9 +31,9 @@ public interface OrderProductRepository extends JpaRepository<OrderProduct, Orde
         GROUP BY p.id, p.name
         ORDER BY SUM(op.quantity) DESC
     """)
-    Page<PopularProductDto> findPopularProductsByPeriod(
-            @Param("start") Instant start,
-            @Param("end") Instant end,
+    Page<PopularProductDtoResponse> findPopularProductsByPeriod(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end,
             Pageable pageable
     );
 }

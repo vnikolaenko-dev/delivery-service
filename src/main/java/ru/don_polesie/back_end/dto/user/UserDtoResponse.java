@@ -10,7 +10,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserDTO {
+public class UserDtoResponse {
     public int id;
     public String name;
     public String surname;

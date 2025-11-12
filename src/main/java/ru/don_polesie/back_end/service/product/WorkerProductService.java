@@ -9,7 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.don_polesie.back_end.dto.product.ProductDtoFull;
-import ru.don_polesie.back_end.dto.product.ProductDtoSearch;
+import ru.don_polesie.back_end.dto.product.request.ProductDtoSearchRequest;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.mapper.ProductMapper;
 import ru.don_polesie.back_end.model.product.Product;
@@ -23,7 +23,7 @@ import java.math.BigDecimal;
 public class WorkerProductService {
 
     @Value("${utils.page-size}")
-    private static int PAGE_SIZE;
+    private int PAGE_SIZE;
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
@@ -39,6 +39,7 @@ public class WorkerProductService {
 
     public Page<ProductDtoFull> findProductsPage(Integer pageNumber) {
         Pageable pageable = createDefaultPageable(pageNumber);
+        // только те товары, которые есть в наличии
         return productRepository.findAllByAmountGreaterThan(0, pageable)
                 .map(productMapper::toProductDtoRR);
     }
@@ -65,7 +66,7 @@ public class WorkerProductService {
      * @return страница с найденными товарами
      */
 
-    public Page<ProductDtoFull> findAllByParams(ProductDtoSearch productDtoSearch, Integer pageNumber) {
+    public Page<ProductDtoFull> findAllByParams(ProductDtoSearchRequest productDtoSearch, Integer pageNumber) {
         Pageable pageable = PageRequest.of(pageNumber, PAGE_SIZE);
         return productRepository.findProductsByParams(
                         productDtoSearch.getId(),
@@ -159,7 +160,7 @@ public class WorkerProductService {
      * @return настроенный объект Pageable
      */
     private Pageable createDefaultPageable(Integer pageNumber) {
-        return PageRequest.of(pageNumber - 1, PAGE_SIZE, Sort.by("id").descending());
+        return PageRequest.of(pageNumber, PAGE_SIZE, Sort.by("id").descending());
     }
 
     /**

@@ -1,6 +1,5 @@
 package ru.don_polesie.back_end.service.order;
 
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -8,8 +7,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.don_polesie.back_end.dto.order.OrderDtoRR;
-import ru.don_polesie.back_end.dto.order.ProcessWeightsRequest;
+import ru.don_polesie.back_end.dto.order.response.OrderDtoResponse;
+import ru.don_polesie.back_end.dto.order.request.ProcessWeightsDtoRequest;
 import ru.don_polesie.back_end.model.enums.OrderStatus;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.mapper.OrderMapper;
@@ -25,14 +24,12 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class WorkerOrderService {
     @Value("${utils.page-size}")
-    private static int PAGE_SIZE;
+    private int PAGE_SIZE;
 
     private final OrderRepository orderRepository;
     private final OrderProductRepository orderProductRepository;
@@ -42,9 +39,9 @@ public class WorkerOrderService {
 
 
 
-    public OrderDtoRR findById(Long id) {
+    public OrderDtoResponse findById(Long id) {
         Order order = orderRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Заказ не найден"));
-        return orderMapper.toOrderDtoRR(order);
+        return orderMapper.toOrderDtoResponse(order);
     }
 
     /**
@@ -54,10 +51,10 @@ public class WorkerOrderService {
      * @return страница заказов в формате DTO
      */
 
-    public Page<OrderDtoRR> findOrdersPage(Integer pageNumber) {
+    public Page<OrderDtoResponse> findOrdersPage(Integer pageNumber) {
         var pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, Sort.by("id").descending());
         return orderRepository.findAll(pageable)
-                .map(orderMapper::toOrderDtoRR);
+                .map(orderMapper::toOrderDtoResponse);
     }
 
     /**
@@ -67,10 +64,10 @@ public class WorkerOrderService {
      * @return страница заказов в формате DTO
      */
 
-    public Page<OrderDtoRR> findMoneyReservaitedOrdersPage(Integer pageNumber) {
+    public Page<OrderDtoResponse> findMoneyReservaitedOrdersPage(Integer pageNumber) {
         var pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, Sort.by("id").descending());
         return orderRepository.findAllMoneyReservaited(pageable)
-                .map(orderMapper::toOrderDtoRR);
+                .map(orderMapper::toOrderDtoResponse);
     }
 
     /**
@@ -100,12 +97,12 @@ public class WorkerOrderService {
      */
 
     @Transactional
-    public void processOrder(Long id, ProcessWeightsRequest request) {
+    public void processOrder(Long id, ProcessWeightsDtoRequest request) {
         Order order = getOrderById(id);
         if (!OrderStatus.MONEY_RESERVAITED.equals(order.getStatus())) {
             throw new IllegalArgumentException("Деньги не зарезервированны, заказ нельзя обработать");
         }
-        Map<Long, ProcessWeightsRequest.WeightDto> weightMap = createWeightMap(request);
+        Map<Long, ProcessWeightsDtoRequest.WeightDto> weightMap = createWeightMap(request);
 
         BigDecimal newTotal = processOrderProducts(order, weightMap);
         updateOrderPayment(order, newTotal);
@@ -153,10 +150,10 @@ public class WorkerOrderService {
     }
 
 
-    public Page<OrderDtoRR> findOrdersPageWithStatus(Integer pageNumber, OrderStatus orderStatus) {
-        var pageable = PageRequest.of(pageNumber - 1, PAGE_SIZE, Sort.by("id").descending());
+    public Page<OrderDtoResponse> findOrdersPageWithStatus(Integer pageNumber, OrderStatus orderStatus) {
+        var pageable = PageRequest.of(pageNumber, PAGE_SIZE, Sort.by("id").descending());
         return orderRepository.findAllByStatus(orderStatus, pageable)
-                .map(orderMapper::toOrderDtoRR);
+                .map(orderMapper::toOrderDtoResponse);
     }
 
     // ========== ПРИВАТНЫЕ ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========
@@ -179,10 +176,10 @@ public class WorkerOrderService {
      * @param request запрос с весами товаров
      * @return карта: productId -> WeightDto
      */
-    private Map<Long, ProcessWeightsRequest.WeightDto> createWeightMap(ProcessWeightsRequest request) {
+    private Map<Long, ProcessWeightsDtoRequest.WeightDto> createWeightMap(ProcessWeightsDtoRequest request) {
         return request.getWeights().stream()
                 .collect(Collectors.toMap(
-                        ProcessWeightsRequest.WeightDto::getProductId,
+                        ProcessWeightsDtoRequest.WeightDto::getProductId,
                         weight -> weight
                 ));
     }
@@ -194,7 +191,7 @@ public class WorkerOrderService {
      * @param weightMap карта весов товаров
      * @return новая общая стоимость заказа
      */
-    private BigDecimal processOrderProducts(Order order, Map<Long, ProcessWeightsRequest.WeightDto> weightMap) {
+    private BigDecimal processOrderProducts(Order order, Map<Long, ProcessWeightsDtoRequest.WeightDto> weightMap) {
         return order.getOrderProducts().stream()
                 .map(orderProduct -> processOrderProduct(orderProduct, weightMap))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -207,7 +204,7 @@ public class WorkerOrderService {
      * @param weightMap карта весов товаров
      * @return стоимость товара после обработки
      */
-    private BigDecimal processOrderProduct(OrderProduct orderProduct, Map<Long, ProcessWeightsRequest.WeightDto> weightMap) {
+    private BigDecimal processOrderProduct(OrderProduct orderProduct, Map<Long, ProcessWeightsDtoRequest.WeightDto> weightMap) {
         int quantityGrams = getProductQuantity(orderProduct, weightMap);
         updateOrderProductQuantity(orderProduct, quantityGrams);
 
@@ -222,9 +219,9 @@ public class WorkerOrderService {
      * @return количество в граммах (для весового) или штуках (для штучного)
      * @throws IllegalArgumentException если не указан вес для весового товара
      */
-    private int getProductQuantity(OrderProduct orderProduct, Map<Long, ProcessWeightsRequest.WeightDto> weightMap) {
+    private int getProductQuantity(OrderProduct orderProduct, Map<Long, ProcessWeightsDtoRequest.WeightDto> weightMap) {
         if (Boolean.TRUE.equals(orderProduct.getProduct().getIsWeighted())) {
-            ProcessWeightsRequest.WeightDto weightDto = weightMap.get(orderProduct.getProduct().getId());
+            ProcessWeightsDtoRequest.WeightDto weightDto = weightMap.get(orderProduct.getProduct().getId());
             if (weightDto == null) {
                 throw new IllegalArgumentException(
                         "Weight not provided for weighted product with id: " + orderProduct.getProduct().getId()

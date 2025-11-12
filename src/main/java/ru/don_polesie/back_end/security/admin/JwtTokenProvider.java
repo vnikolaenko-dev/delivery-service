@@ -11,7 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
-import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
+import ru.don_polesie.back_end.dto.auth.response.JwtAuthResponse;
 import ru.don_polesie.back_end.exceptions.AccessDeniedException;
 import ru.don_polesie.back_end.model.Role;
 import ru.don_polesie.back_end.service.staffOnly.StaffService;

@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class RevenueDto {
+public class RevenueDtoResponse {
     private Long revenue;
     private String period;
 }

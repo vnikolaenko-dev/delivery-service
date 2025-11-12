@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
-import ru.don_polesie.back_end.dto.auth.JwtRefreshRequest;
+import ru.don_polesie.back_end.dto.auth.response.JwtAuthResponse;
+import ru.don_polesie.back_end.dto.auth.request.JwtRefreshRequest;
 import ru.don_polesie.back_end.service.auth.UserAuthService;
 
 import javax.management.BadAttributeValueExpException;

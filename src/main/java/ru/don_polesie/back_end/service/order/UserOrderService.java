@@ -9,10 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.don_polesie.back_end.dto.user.AddressDTO;
-import ru.don_polesie.back_end.dto.order.OrderCreateResponse;
-import ru.don_polesie.back_end.dto.order.OrderDtoRR;
-import ru.don_polesie.back_end.dto.order.OrderItemDto;
+import ru.don_polesie.back_end.dto.address.response.AddressDtoResponse;
+import ru.don_polesie.back_end.dto.order.response.OrderDtoResponse;
+import ru.don_polesie.back_end.dto.order.response.OrderCreatedDtoResponse;
 import ru.don_polesie.back_end.exceptions.ConflictDataException;
 import ru.don_polesie.back_end.model.basket.Basket;
 import ru.don_polesie.back_end.model.basket.BasketProduct;
@@ -62,9 +61,9 @@ public class UserOrderService {
      * @throws ObjectNotFoundException если заказ не найден
      */
 
-    public OrderDtoRR findById(Long id) {
+    public OrderDtoResponse findById(Long id) {
         return orderRepository.findById(id)
-                .map(orderMapper::toOrderDtoRR)
+                .map(orderMapper::toOrderDtoResponse)
                 .orElseThrow(() -> new ObjectNotFoundException("Order not found with id: " + id));
     }
 
@@ -76,10 +75,10 @@ public class UserOrderService {
      * @return страница с заказами
      */
 
-    public Page<OrderDtoRR> findUserOrdersPage(Integer pageNumber, String phoneNumber) {
+    public Page<OrderDtoResponse> findUserOrdersPage(Integer pageNumber, String phoneNumber) {
         Pageable pageable = createPageable(pageNumber);
         return orderRepository.findByUserPhoneNumber(phoneNumber, pageable)
-                .map(orderMapper::toOrderDtoRR);
+                .map(orderMapper::toOrderDtoResponse);
     }
 
     /**
@@ -90,10 +89,10 @@ public class UserOrderService {
      * @return страница с доставленными заказами
      */
 
-    public Page<OrderDtoRR> findShippedUserOrdersPage(Integer pageNumber, String phoneNumber) {
+    public Page<OrderDtoResponse> findShippedUserOrdersPage(Integer pageNumber, String phoneNumber) {
         Pageable pageable = createPageable(pageNumber);
         return orderRepository.findByUserPhoneNumberAndStatus(phoneNumber, OrderStatus.SHIPPED, pageable)
-                .map(orderMapper::toOrderDtoRR);
+                .map(orderMapper::toOrderDtoResponse);
     }
 
     /**
@@ -117,7 +116,7 @@ public class UserOrderService {
      * @throws RuntimeException если не удалось создать платеж
      */
     @Transactional
-    public OrderCreateResponse save(User user, Long addressId) {
+    public OrderCreatedDtoResponse save(User user, Long addressId) {
         Optional<Address> address = addressRepository.findById(addressId);
         if (address.isEmpty()) {
             throw new ObjectNotFoundException("Address not found with id: " + addressId);
@@ -185,7 +184,7 @@ public class UserOrderService {
 
     @Deprecated
     @Transactional
-    public OrderCreateResponse changeQuantityProductFromOrder(Long orderId, Long productId, int quantity) {
+    public OrderCreatedDtoResponse changeQuantityProductFromOrder(Long orderId, Long productId, int quantity) {
         Order order = getOrderById(orderId);
         if (order.getStatus() != OrderStatus.PAYING) {
             throw new RuntimeException("Невозможно редактировать заказ.");
@@ -213,9 +212,9 @@ public class UserOrderService {
      */
     @Deprecated
     @Transactional
-    public OrderCreateResponse deleteProductFromOrder(Long orderId, Long productId) {
+    public OrderCreatedDtoResponse deleteProductFromOrder(Long orderId, Long productId) {
         Order order = getOrderById(orderId);
-        if (order.getStatus() != OrderStatus.NEW) {
+        if (order.getStatus() != OrderStatus.MONEY_RESERVAITED) {
             throw new RuntimeException("Невозможно редактировать заказ.");
         }
         Product product = getProductById(productId);
@@ -242,7 +241,7 @@ public class UserOrderService {
     /**
      * Обрабатывает адрес доставки
      */
-    private Address processAddress(AddressDTO addressDto) {
+    private Address processAddress(AddressDtoResponse addressDto) {
         Address address = addressMapper.toEntity(addressDto);
         return findExistingAddressOrSaveNew(address);
     }
@@ -261,8 +260,8 @@ public class UserOrderService {
     /**
      * Создает новый заказ
      */
-    private Order createOrder(OrderDtoRR orderDtoRR, User user, Address address) {
-        Order order = orderMapper.toOrder(orderDtoRR);
+    private Order createOrder(OrderDtoResponse orderDtoResponse, User user, Address address) {
+        Order order = orderMapper.toOrder(orderDtoResponse);
         order.setUser(user);
         order.setAddress(address);
         order.setStatus(OrderStatus.NEW);
@@ -273,11 +272,11 @@ public class UserOrderService {
     /**
      * Обрабатывает товары в заказе и рассчитывает общую стоимость
      */
-    private void processOrderItems(OrderDtoRR orderDtoRR, Order order) {
+    private void processOrderItems(OrderDtoResponse orderDtoResponse, Order order) {
         BigDecimal totalAmount = BigDecimal.ZERO;
         List<OrderProduct> orderProducts = new ArrayList<>();
 
-        for (OrderItemDto itemDto : orderDtoRR.getItems()) {
+        for (OrderDtoResponse.OrderItemDto itemDto : orderDtoResponse.getItems()) {
             Product product = productRepository.findById(itemDto.getProductId())
                     .orElseThrow(() -> new RuntimeException("Product not found: " + itemDto.getProductId()));
 
@@ -308,10 +307,11 @@ public class UserOrderService {
         order.setTotalAmount(totalAmount);
         order.setStatus(OrderStatus.PAYING);
     }
+
     /**
      * Обрабатывает один товар в заказе
      */
-    private BigDecimal processOrderItem(OrderItemDto orderItem, Order order) {
+    private BigDecimal processOrderItem(OrderDtoResponse.OrderItemDto orderItem, Order order) {
         Product product = getProductById(orderItem.getProductId());
         OrderProduct orderProduct = new OrderProduct(order, product, orderItem.getQuantity());
 
@@ -324,10 +324,10 @@ public class UserOrderService {
     /**
      * Создает ответ с данными платежа
      */
-    private OrderCreateResponse createPaymentResponse(Order order) {
+    private OrderCreatedDtoResponse createPaymentResponse(Order order) {
         try {
-            return new OrderCreateResponse(
-                    orderMapper.toOrderDtoRR(order),
+            return new OrderCreatedDtoResponse(
+                    orderMapper.toOrderDtoResponse(order),
                     yooKassaServiceImpl.createPayment(order.getId())
             );
         } catch (Exception e) {

@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.don_polesie.back_end.dto.product.ProductDtoFull;
-import ru.don_polesie.back_end.dto.product.ProductDtoSearch;
+import ru.don_polesie.back_end.dto.product.request.ProductDtoSearchRequest;
 import ru.don_polesie.back_end.service.product.WorkerProductService;
 
 
@@ -68,7 +68,7 @@ public class ProductSearchController {
                                                                 @RequestParam(required = false) String brand,
                                                                 @RequestParam(required = false) String name,
                                                                 @RequestParam(required = false) Integer pageNumber) {
-        ProductDtoSearch productDtoSearch = ProductDtoSearch
+        ProductDtoSearchRequest productDtoSearch = ProductDtoSearchRequest
                 .builder()
                 .id(id)
                 .brand(brand)

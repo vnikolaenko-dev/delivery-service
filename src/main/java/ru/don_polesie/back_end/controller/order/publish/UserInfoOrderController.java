@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.don_polesie.back_end.dto.order.OrderDtoRR;
+import ru.don_polesie.back_end.dto.order.response.OrderDtoResponse;
 import ru.don_polesie.back_end.security.SecurityUtils;
 import ru.don_polesie.back_end.service.order.UserOrderService;
 
@@ -31,9 +31,9 @@ public class UserInfoOrderController {
             description = "Возвращает все заказы пользователя"
     )
     @GetMapping("")
-    public ResponseEntity<Page<OrderDtoRR>> findOrdersPage(@RequestParam @Min(value = 0) Integer pageNumber) {
+    public ResponseEntity<Page<OrderDtoResponse>> findOrdersPage(@RequestParam @Min(value = 0) Integer pageNumber) {
         String phoneNumber = securityUtils.getCurrentPhoneNumber();
-        Page<OrderDtoRR> ordersPage = orderService.findUserOrdersPage(pageNumber, phoneNumber);
+        Page<OrderDtoResponse> ordersPage = orderService.findUserOrdersPage(pageNumber, phoneNumber);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(ordersPage);
@@ -44,7 +44,7 @@ public class UserInfoOrderController {
             description = "Возвращает историю заказов текущего пользователя с пагинацией"
     )
     @GetMapping("/shipped")
-    public ResponseEntity<Page<OrderDtoRR>> findShippedUserOrdersPage(@RequestParam @Min(value = 0) Integer pageNumber) {
+    public ResponseEntity<Page<OrderDtoResponse>> findShippedUserOrdersPage(@RequestParam @Min(value = 0) Integer pageNumber) {
         String phoneNumber = securityUtils.getCurrentPhoneNumber();
         return ResponseEntity
                 .status(HttpStatus.FOUND)
@@ -60,7 +60,7 @@ public class UserInfoOrderController {
             @ApiResponse(responseCode = "404", description = "Заказ не найден или недоступен")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<OrderDtoRR> findById(@PathVariable @Min(value = 1) Long id) {
+    public ResponseEntity<OrderDtoResponse> findById(@PathVariable @Min(value = 1) Long id) {
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(orderService.findById(id));

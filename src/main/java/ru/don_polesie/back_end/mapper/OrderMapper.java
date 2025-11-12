@@ -3,8 +3,7 @@ package ru.don_polesie.back_end.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import ru.don_polesie.back_end.dto.order.OrderDtoRR;
-import ru.don_polesie.back_end.dto.order.OrderItemDto;
+import ru.don_polesie.back_end.dto.order.response.OrderDtoResponse;
 import ru.don_polesie.back_end.model.order.Order;
 import ru.don_polesie.back_end.model.order.OrderProduct;
 
@@ -16,16 +15,16 @@ import java.util.stream.Collectors;
 public interface OrderMapper {
 
     @Mapping(source = "orderProducts", target = "items", qualifiedByName = "mapItems")
-    OrderDtoRR toOrderDtoRR(Order order);
+    OrderDtoResponse toOrderDtoResponse(Order order);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "orderProducts", ignore = true)
-    Order toOrder(OrderDtoRR orderDtoRR);
+    Order toOrder(OrderDtoResponse orderDtoResponse);
 
     @Named("mapItems")
-    default List<OrderItemDto> mapItems(Set<OrderProduct> ops) {
+    default List<OrderDtoResponse.OrderItemDto> mapItems(Set<OrderProduct> ops) {
         return ops.stream()
-                .map(op -> new OrderItemDto(
+                .map(op -> new OrderDtoResponse.OrderItemDto(
                         op.getProduct().getId(),
                         op.getProduct().getName(),
                         op.getQuantity(),

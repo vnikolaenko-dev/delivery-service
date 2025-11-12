@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.don_polesie.back_end.dto.user.UserDTO;
+import ru.don_polesie.back_end.dto.user.UserDtoResponse;
 import ru.don_polesie.back_end.service.staffOnly.AdminService;
 
 @RestController
@@ -27,8 +27,8 @@ public class AdminUserManageController {
             description = "Возвращает постраничный список всех зарегистрированных пользователей системы"
     )
     @GetMapping("/users")
-    public ResponseEntity<Page<UserDTO>> findUsersPage(@RequestParam @Min(0) Integer pageNumber) {
-        Page<UserDTO> usersPage = adminService.findUsersPage(pageNumber);
+    public ResponseEntity<Page<UserDtoResponse>> findUsersPage(@RequestParam @Min(0) Integer pageNumber) {
+        Page<UserDtoResponse> usersPage = adminService.findUsersPage(pageNumber);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(usersPage);
@@ -39,8 +39,8 @@ public class AdminUserManageController {
             description = "Возвращает постраничный список всех сотрудников с правами работника"
     )
     @GetMapping("/workers")
-    public ResponseEntity<Page<UserDTO>> findWorkersPage(@RequestParam @Min(0) Integer pageNumber) {
-        Page<UserDTO> workersPage = adminService.findWorkersPage(pageNumber);
+    public ResponseEntity<Page<UserDtoResponse>> findWorkersPage(@RequestParam @Min(0) Integer pageNumber) {
+        Page<UserDtoResponse> workersPage = adminService.findWorkersPage(pageNumber);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(workersPage);
@@ -51,8 +51,8 @@ public class AdminUserManageController {
             description = "Создает пользователя с заданными ролями"
     )
     @PostMapping("/user/create")
-    public ResponseEntity<Void> createUser(@RequestBody UserDTO userDTO) {
-        adminService.createUser(userDTO);
+    public ResponseEntity<Void> createUser(@RequestBody UserDtoResponse userDtoResponse) {
+        adminService.createUser(userDtoResponse);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .build();
@@ -63,8 +63,8 @@ public class AdminUserManageController {
             description = "Обновляет пользователя"
     )
     @PostMapping("/user/update")
-    public ResponseEntity<Void> updateUser(@RequestBody UserDTO userDTO) {
-        adminService.createUser(userDTO);
+    public ResponseEntity<Void> updateUser(@RequestBody UserDtoResponse userDtoResponse) {
+        adminService.createUser(userDtoResponse);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .build();

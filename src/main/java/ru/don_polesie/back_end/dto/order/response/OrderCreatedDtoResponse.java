@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.dto.order;
+package ru.don_polesie.back_end.dto.order.response;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.*;
@@ -8,8 +8,8 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class OrderCreateResponse {
-    private OrderDtoRR order;
+public class OrderCreatedDtoResponse {
+    private OrderDtoResponse order;
     private JsonNode payment;
 }
 

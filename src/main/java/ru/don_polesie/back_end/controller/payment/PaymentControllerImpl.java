@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import ru.don_polesie.back_end.dto.payment.CreatePaymentRequest;
 import ru.don_polesie.back_end.service.system.YooKassaService;
 
 import java.util.Map;
@@ -20,12 +19,6 @@ public class PaymentControllerImpl implements PaymentController {
 
     private final YooKassaService yooKassaServiceImpl;
 
-    @Override
-    @Deprecated
-    public ResponseEntity<?> createPayment(@RequestBody CreatePaymentRequest req) throws Exception {
-        JsonNode payment = yooKassaServiceImpl.createPayment(req.getOrderId());
-        return ResponseEntity.ok().body(payment);
-    }
 
     @Override
     public ResponseEntity<?> notifications(

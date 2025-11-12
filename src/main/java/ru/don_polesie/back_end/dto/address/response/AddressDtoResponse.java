@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.dto.user;
+package ru.don_polesie.back_end.dto.address.response;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +10,7 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-public class AddressDTO {
+public class AddressDtoResponse {
     private Long id;
     @NotBlank
     private String city;

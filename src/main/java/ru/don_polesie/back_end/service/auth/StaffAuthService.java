@@ -3,8 +3,8 @@ package ru.don_polesie.back_end.service.auth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.don_polesie.back_end.dto.auth.JwtAuthRequest;
-import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
+import ru.don_polesie.back_end.dto.auth.request.JwtAuthRequest;
+import ru.don_polesie.back_end.dto.auth.response.JwtAuthResponse;
 import ru.don_polesie.back_end.security.admin.JwtTokenProvider;
 
 

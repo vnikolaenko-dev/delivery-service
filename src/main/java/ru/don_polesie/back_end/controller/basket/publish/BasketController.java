@@ -7,10 +7,9 @@ import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.don_polesie.back_end.dto.user.BasketDTO;
+import ru.don_polesie.back_end.dto.basket.BasketDtoResponse;
 import ru.don_polesie.back_end.mapper.BasketMapper;
 import ru.don_polesie.back_end.mapper.ProductMapper;
-import ru.don_polesie.back_end.model.user.User;
 import ru.don_polesie.back_end.security.SecurityUtils;
 import ru.don_polesie.back_end.service.basket.BasketService;
 import ru.don_polesie.back_end.service.order.PriceService;
@@ -30,10 +29,10 @@ public class BasketController {
     private final ProductMapper productMapper;
 
     @GetMapping
-    public ResponseEntity<BasketDTO> getBasket() {
-        User user = securityUtils.getCurrentUser();
+    public ResponseEntity<BasketDtoResponse> getBasket() {
+        var user = securityUtils.getCurrentUser();
         var resp = basketService.getBasket(user.getPhoneNumber());
-        BasketDTO dto = basketMapper.toDto(resp);
+        var dto = basketMapper.toDto(resp);
         dto.setTotalPrice(BigDecimal.ZERO);
         dto.getItems().forEach(
                 orderItemDto -> {
@@ -56,7 +55,7 @@ public class BasketController {
     public ResponseEntity<Void> addProduct(
             @RequestParam @Min(value = 1) Long productId,
             @RequestParam (defaultValue = "1") @Min(value = 1) int quantity) {
-        User user = securityUtils.getCurrentUser();
+        var user = securityUtils.getCurrentUser();
         basketService.addProduct(user.getPhoneNumber(), productId, quantity);
         return ResponseEntity.ok().build();
     }
@@ -73,7 +72,7 @@ public class BasketController {
     @GetMapping("/change-quantity")
     public ResponseEntity<Void> changeProductQuantity(@RequestParam @Min(value = 1) Long productId,
                                                         @RequestParam @Min(value = 1) int quantity) {
-        User user = securityUtils.getCurrentUser();
+        var user = securityUtils.getCurrentUser();
         basketService.changeQuantityProduct(user.getPhoneNumber(), productId, quantity);
         return ResponseEntity.ok().build();
     }
@@ -89,7 +88,7 @@ public class BasketController {
     })
     @DeleteMapping("/product")
     public ResponseEntity<Void> deleteProductFromOrder(@RequestParam @Min(value = 1) Long productId) {
-        User user = securityUtils.getCurrentUser();
+        var user = securityUtils.getCurrentUser();
         basketService.deleteProductFromBasket(user.getPhoneNumber(), productId);
         return ResponseEntity.ok().build();
     }

@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.don_polesie.back_end.dto.auth.JwtAuthRequest;
-import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
+import ru.don_polesie.back_end.dto.auth.request.JwtAuthRequest;
+import ru.don_polesie.back_end.dto.auth.response.JwtAuthResponse;
 import ru.don_polesie.back_end.service.auth.StaffAuthService;
 
 @Tag(

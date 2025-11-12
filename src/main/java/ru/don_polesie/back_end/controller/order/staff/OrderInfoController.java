@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.don_polesie.back_end.dto.order.OrderDtoRR;
+import ru.don_polesie.back_end.dto.order.response.OrderDtoResponse;
 import ru.don_polesie.back_end.model.enums.OrderStatus;
 import ru.don_polesie.back_end.service.order.WorkerOrderService;
 
@@ -22,7 +22,7 @@ public class OrderInfoController {
             description = "Возвращает заказ по id"
     )
     @GetMapping("/{id}")
-    public ResponseEntity<OrderDtoRR> findById(@PathVariable @Min(1) Long id) {
+    public ResponseEntity<OrderDtoResponse> findById(@PathVariable @Min(1) Long id) {
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(workOrderService.findById(id));
@@ -33,8 +33,8 @@ public class OrderInfoController {
             description = "Возвращает страницу заказов, требующих обработки сотрудниками"
     )
     @GetMapping
-    public ResponseEntity<Page<OrderDtoRR>> findOrdersPage(@RequestParam @Min(0) Integer pageNumber) {
-        Page<OrderDtoRR> ordersPage = workOrderService.findOrdersPage(pageNumber);
+    public ResponseEntity<Page<OrderDtoResponse>> findOrdersPage(@RequestParam @Min(0) Integer pageNumber) {
+        Page<OrderDtoResponse> ordersPage = workOrderService.findOrdersPage(pageNumber);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(ordersPage);
@@ -45,9 +45,9 @@ public class OrderInfoController {
             description = "Возвращает страницу заказов с определенным статусом"
     )
     @GetMapping("/status")
-    public ResponseEntity<Page<OrderDtoRR>> findByStatus(@RequestParam @Min(0) Integer pageNumber, @RequestParam String status) {
+    public ResponseEntity<Page<OrderDtoResponse>> findByStatus(@RequestParam @Min(0) Integer pageNumber, @RequestParam String status) {
         OrderStatus orderStatus = OrderStatus.valueOf(status);
-        Page<OrderDtoRR> ordersPage = workOrderService.findOrdersPageWithStatus(pageNumber, orderStatus);
+        Page<OrderDtoResponse> ordersPage = workOrderService.findOrdersPageWithStatus(pageNumber, orderStatus);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(ordersPage);

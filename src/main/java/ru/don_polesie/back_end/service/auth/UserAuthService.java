@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
+import ru.don_polesie.back_end.dto.auth.response.JwtAuthResponse;
 import ru.don_polesie.back_end.exceptions.RequestValidationException;
 import ru.don_polesie.back_end.model.Role;
 import ru.don_polesie.back_end.model.user.User;

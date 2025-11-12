@@ -12,6 +12,7 @@ import ru.don_polesie.back_end.model.order.Order;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,8 +59,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o " +
             "WHERE o.createdAt BETWEEN :start AND :end AND o.status = ru.don_polesie.back_end.model.enums.OrderStatus.SHIPPED")
-    BigDecimal calculateRevenueByPeriod(@Param("start") Instant start, @Param("end") Instant end);
+    BigDecimal calculateRevenueByPeriod(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
 
-    Long countByCreatedAtBetween(Instant start, Instant end);
+    Long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

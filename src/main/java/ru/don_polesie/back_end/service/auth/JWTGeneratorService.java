@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
-import ru.don_polesie.back_end.dto.auth.JwtAuthResponse;
+import ru.don_polesie.back_end.dto.auth.response.JwtAuthResponse;
 import ru.don_polesie.back_end.security.admin.JwtTokenProvider;
 import ru.don_polesie.back_end.service.staffOnly.StaffService;
 

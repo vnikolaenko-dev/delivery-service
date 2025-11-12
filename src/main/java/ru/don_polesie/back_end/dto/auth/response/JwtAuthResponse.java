@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.dto.auth;
+package ru.don_polesie.back_end.dto.auth.response;
 
 import lombok.Getter;
 import lombok.Setter;

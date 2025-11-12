@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.dto.order;
+package ru.don_polesie.back_end.dto.order.request;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProcessWeightsRequest {
+public class ProcessWeightsDtoRequest {
 
     private List<WeightDto> weights;
 

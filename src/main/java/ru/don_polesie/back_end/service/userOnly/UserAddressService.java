@@ -2,7 +2,8 @@ package ru.don_polesie.back_end.service.userOnly;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.don_polesie.back_end.dto.user.AddressDTO;
+import ru.don_polesie.back_end.dto.address.request.AddressDtoRequest;
+import ru.don_polesie.back_end.dto.address.response.AddressDtoResponse;
 import ru.don_polesie.back_end.mapper.AddressMapper;
 import ru.don_polesie.back_end.model.user.Address;
 import ru.don_polesie.back_end.model.user.User;
@@ -23,7 +24,7 @@ public class UserAddressService {
      * @return список адресов в формате DTO
      */
 
-    public List<AddressDTO> getUserAddresses(User user) {
+    public List<AddressDtoResponse> getUserAddresses(User user) {
         return addressRepository.findAllByUser(user)
                 .stream()
                 .map(addressMapper::toDto)
@@ -38,8 +39,8 @@ public class UserAddressService {
      * @return строковое представление сохраненного адреса
      */
 
-    public String save(AddressDTO addressDTO, User user) {
-        Address address = addressMapper.toEntity(addressDTO);
+    public String save(AddressDtoRequest addressDTO, User user) {
+        Address address = addressMapper.toEntityFromAddressDtoRequest(addressDTO);
         address.setUser(user);
         addressRepository.save(address);
         return address.toString();

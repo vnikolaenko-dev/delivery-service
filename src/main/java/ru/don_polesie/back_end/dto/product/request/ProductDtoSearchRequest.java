@@ -1,4 +1,4 @@
-package ru.don_polesie.back_end.dto.product;
+package ru.don_polesie.back_end.dto.product.request;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class ProductDtoSearch {
+public class ProductDtoSearchRequest {
     private Long id;
     private String brand;
     private String name;
