@@ -12,7 +12,7 @@ import ru.don_polesie.back_end.mapper.BasketMapper;
 import ru.don_polesie.back_end.mapper.ProductMapper;
 import ru.don_polesie.back_end.security.SecurityUtils;
 import ru.don_polesie.back_end.service.basket.BasketService;
-import ru.don_polesie.back_end.service.order.PriceService;
+import ru.don_polesie.back_end.service.system.PriceService;
 import ru.don_polesie.back_end.service.product.WorkerProductService;
 
 import java.math.BigDecimal;

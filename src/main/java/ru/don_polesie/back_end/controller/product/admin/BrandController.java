@@ -1,14 +1,14 @@
 package ru.don_polesie.back_end.controller.product.admin;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.don_polesie.back_end.model.product.Brand;
 import ru.don_polesie.back_end.service.product.BrandService;
+
+import javax.management.BadAttributeValueExpException;
 
 @RestController
 @AllArgsConstructor
@@ -19,9 +19,27 @@ public class BrandController {
     @Operation(
             summary = "Создать бренд"
     )
-    @GetMapping("/create")
+    @PostMapping
     public ResponseEntity<Void> createBrand(@RequestParam String name) {
         brandService.save(new Brand(name));
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Обновить брэнд"
+    )
+    @PutMapping
+    public ResponseEntity<Void> updateCategory(@RequestParam @Min(1) Integer id, @RequestParam String name) throws BadAttributeValueExpException {
+        brandService.update(id, name);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Удалить бренд"
+    )
+    @DeleteMapping
+    public ResponseEntity<Void> removeCategory(@RequestParam @Min(1) Integer id) throws BadAttributeValueExpException {
+        brandService.remove(id);
         return ResponseEntity.ok().build();
     }
 }

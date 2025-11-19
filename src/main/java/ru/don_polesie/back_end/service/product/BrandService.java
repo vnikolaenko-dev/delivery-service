@@ -1,16 +1,29 @@
 package ru.don_polesie.back_end.service.product;
 
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.don_polesie.back_end.dto.product.ProductDtoFull;
 import ru.don_polesie.back_end.model.product.Brand;
+import ru.don_polesie.back_end.model.product.Category;
+import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.BrandRepository;
+import ru.don_polesie.back_end.repository.CategoryRepository;
+import ru.don_polesie.back_end.repository.ProductRepository;
 
+import javax.management.BadAttributeValueExpException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class BrandService {
     private BrandRepository brandRepository;
+    private ProductRepository productRepository;
 
     public void save(Brand brand) {
         if (brandRepository.findByName(brand.getName()).isPresent()) {
@@ -25,5 +38,28 @@ public class BrandService {
 
     public Brand findByName(String name) {
         return brandRepository.findByName(name).orElse(null);
+    }
+
+    public void update(@Min(1) Integer id, String name) throws BadAttributeValueExpException {
+        Optional<Brand> brand = brandRepository.findById(id);
+        if (brand.isEmpty()) {
+            throw new BadAttributeValueExpException("Категорию невозможно удалить: такой категории не существует");
+        }
+        brand.get().setName(name);
+        brandRepository.save(brand.get());
+    }
+
+
+    public void remove(@Min(1) Integer id) throws BadAttributeValueExpException {
+        Optional<Brand> brand = brandRepository.findById(id);
+        if (brand.isEmpty()) {
+            throw new BadAttributeValueExpException("Категорию невозможно удалить: такой категории не существует");
+        }
+        Page<Product> page = productRepository.findPByBrand(brand.get(),  PageRequest.of(0, 1, Sort.by("id").descending()));
+        if (!page.isEmpty()) {
+            throw new BadAttributeValueExpException("Категорию невозможно удалить: существуют товары с такой категорией.");
+        }
+
+        brandRepository.deleteById(id);
     }
 }

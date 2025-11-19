@@ -12,7 +12,7 @@ import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.BasketProductRepository;
 import ru.don_polesie.back_end.repository.BasketRepository;
 import ru.don_polesie.back_end.repository.ProductRepository;
-import ru.don_polesie.back_end.service.order.PriceService;
+import ru.don_polesie.back_end.service.system.PriceService;
 
 import java.math.BigDecimal;
 

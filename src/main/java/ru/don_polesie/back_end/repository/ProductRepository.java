@@ -1,6 +1,7 @@
 package ru.don_polesie.back_end.repository;
 
 
+import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.don_polesie.back_end.model.product.Brand;
+import ru.don_polesie.back_end.model.product.Category;
 import ru.don_polesie.back_end.model.product.Product;
 
 import java.util.ArrayList;
@@ -52,4 +54,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findByBrandAndName(Brand brand, String name);
 
+    Page<Product> findPByCategory(@NotNull(message = "Категория обязательна") Category category, Pageable pageable);
+
+    Page<Product> findPByBrand(@NotNull(message = "Бренд обязан быть") Brand brand, Pageable pageable);
 }

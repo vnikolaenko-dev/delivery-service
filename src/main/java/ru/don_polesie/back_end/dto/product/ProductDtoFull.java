@@ -72,4 +72,6 @@ public class ProductDtoFull {
 
     @NotBlank(message = "Страна-производитель обязательна")
     private String countryOfOrigin;
+
+    private Integer sale;
 }

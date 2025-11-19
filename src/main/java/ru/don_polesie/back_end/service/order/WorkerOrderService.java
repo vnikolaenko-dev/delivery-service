@@ -1,6 +1,7 @@
 package ru.don_polesie.back_end.service.order;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,7 @@ import ru.don_polesie.back_end.model.order.OrderProduct;
 import ru.don_polesie.back_end.repository.OrderProductRepository;
 import ru.don_polesie.back_end.repository.OrderRepository;
 
+import ru.don_polesie.back_end.service.system.PriceService;
 import ru.don_polesie.back_end.service.system.YooKassaService;
 
 import java.math.BigDecimal;
@@ -97,13 +99,12 @@ public class WorkerOrderService {
      */
 
     @Transactional
-    public void processOrder(Long id, ProcessQuantitiesDtoRequest request) {
+    public void processOrder(Long id, ProcessQuantitiesDtoRequest request) throws BadRequestException {
         Order order = getOrderById(id);
         if (!OrderStatus.MONEY_RESERVAITED.equals(order.getStatus())) {
-            throw new IllegalArgumentException("Деньги не зарезервированны, заказ нельзя обработать");
+            throw new IllegalArgumentException("Деньги не зарезервированы, заказ нельзя обработать");
         }
         Map<Long, ProcessQuantitiesDtoRequest.QuantityDto> quantitesMap = createQuantitesMap(request);
-
         BigDecimal newTotal = processOrderProducts(order, quantitesMap);
         updateOrderPayment(order, newTotal);
 
@@ -113,7 +114,7 @@ public class WorkerOrderService {
     public void deleteProductFromOrder(Long orderId, Long productId) {
         Order order = getOrderById(orderId);
         if (!OrderStatus.MONEY_RESERVAITED.equals(order.getStatus())) {
-            throw new IllegalArgumentException("Деньги не зарезервированны, заказ нельзя обработать");
+            throw new IllegalArgumentException("Деньги не зарезервированы, заказ нельзя обработать");
         }
 
         for(OrderProduct orderProduct : order.getOrderProducts()) {
@@ -188,10 +189,18 @@ public class WorkerOrderService {
      * Обрабатывает все товары в заказе и вычисляет новую общую стоимость
      *
      * @param order заказ для обработки
-     * @param weightMap карта весов товаров
      * @return новая общая стоимость заказа
      */
-    private BigDecimal processOrderProducts(Order order, Map<Long, ProcessQuantitiesDtoRequest.QuantityDto> quantityDtoMap) {
+    private BigDecimal processOrderProducts(Order order, Map<Long, ProcessQuantitiesDtoRequest.QuantityDto> quantityDtoMap) throws BadRequestException {
+        for (OrderProduct orderProduct : order.getOrderProducts()) {
+            if (!quantityDtoMap.containsKey(orderProduct.getProduct().getId())) {
+                throw new BadRequestException("Не указано число товара: " + orderProduct.getProduct().getName());
+            } else if (quantityDtoMap.get(orderProduct.getProduct().getId()).getQuantity() > orderProduct.getQuantity()) {
+                throw new BadRequestException("Число товаров не может превышать изначального: " + orderProduct.getProduct().getName());
+            } else if (quantityDtoMap.get(orderProduct.getProduct().getId()).getQuantity() == 0) {
+                orderProductRepository.delete(orderProduct);
+            }
+        }
         return order.getOrderProducts().stream()
                 .map(orderProduct -> processOrderProduct(orderProduct, quantityDtoMap))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -205,31 +214,10 @@ public class WorkerOrderService {
      * @return стоимость товара после обработки
      */
     private BigDecimal processOrderProduct(OrderProduct orderProduct, Map<Long, ProcessQuantitiesDtoRequest.QuantityDto> quantityDtoMapMap) {
-        int quantity = getProductQuantity(orderProduct, quantityDtoMapMap);
-        updateOrderProductQuantity(orderProduct, quantity);
-        return calculateProductCost(orderProduct, quantity);
+        updateOrderProductQuantity(orderProduct, quantityDtoMapMap.get(orderProduct.getProduct().getId()).getQuantity());
+        return calculateProductCost(orderProduct, quantityDtoMapMap.get(orderProduct.getProduct().getId()).getQuantity());
     }
 
-    /**
-     * Получает количество товара с учетом типа (весовой/штучный)
-     *
-     * @param orderProduct товар в заказе
-     * @param quantityDtoMapMap карта количества каждого товара
-     * @return количество в граммах (для весового) или штуках (для штучного)
-     * @throws IllegalArgumentException если не указан вес для весового товара
-     */
-    private int getProductQuantity(OrderProduct orderProduct, Map<Long, ProcessQuantitiesDtoRequest.QuantityDto> quantityDtoMapMap) {
-        if (Boolean.TRUE.equals(orderProduct.getProduct().getIsWeighted())) {
-            ProcessQuantitiesDtoRequest.QuantityDto quantityDto = quantityDtoMapMap.get(orderProduct.getProduct().getId());
-            if (quantityDto == null) {
-                throw new IllegalArgumentException(
-                        "Weight not provided for weighted product with id: " + orderProduct.getProduct().getId()
-                );
-            }
-            return quantityDto.getQuantity();
-        }
-        return orderProduct.getQuantity();
-    }
 
     /**
      * Обновляет количество товара в заказе

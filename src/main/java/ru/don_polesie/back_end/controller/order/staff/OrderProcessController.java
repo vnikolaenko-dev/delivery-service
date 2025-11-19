@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.don_polesie.back_end.dto.order.request.ProcessQuantitiesDtoRequest;
@@ -22,7 +23,7 @@ public class OrderProcessController {
     )
     @PostMapping("/{id}/process")
     public ResponseEntity<Void> process(@PathVariable @Min(value = 1) Long id,
-                                        @RequestBody @Valid ProcessQuantitiesDtoRequest req) {
+                                        @RequestBody @Valid ProcessQuantitiesDtoRequest req) throws BadRequestException {
         workOrderService.processOrder(id, req);
         return ResponseEntity.ok().build();
     }

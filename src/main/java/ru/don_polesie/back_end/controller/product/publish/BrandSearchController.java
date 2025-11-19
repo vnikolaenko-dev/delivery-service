@@ -20,7 +20,7 @@ public class BrandSearchController {
     private BrandService brandService;
 
     @Operation(
-            summary = "Получить список брендоа"
+            summary = "Получить список брендов"
     )
     @GetMapping
     public ResponseEntity<List<Brand>> getBrands(){

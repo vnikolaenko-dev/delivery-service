@@ -15,6 +15,8 @@ import ru.don_polesie.back_end.dto.product.ProductDtoFull;
 import ru.don_polesie.back_end.dto.product.request.ProductDtoSearchRequest;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.mapper.ProductMapper;
+import ru.don_polesie.back_end.model.product.Brand;
+import ru.don_polesie.back_end.model.product.Category;
 import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.ProductRepository;
 
@@ -54,6 +56,24 @@ public class WorkerProductService {
         // только те товары, которые со скидкой
         return productRepository.findAllBySaleGreaterThan(0, pageable)
                 .map(productMapper::toProductDtoRR);
+    }
+
+    public Page<ProductDtoFull> findProductsByCategory(@Min(value = 0) Integer pageNumber, Category category) {
+        Pageable pageable = createDefaultPageable(pageNumber);
+        Page<Product> productsPage = productRepository.findPByCategory(category, pageable);
+        if (!productsPage.hasContent()) {
+            throw new ObjectNotFoundException("Продуктов с такой категорией не найдено");
+        }
+        return productsPage.map(productMapper::toProductDtoRR);
+    }
+
+    public Page<ProductDtoFull> findProductsByBrand(@Min(value = 0) Integer pageNumber, Brand brand) {
+        Pageable pageable = createDefaultPageable(pageNumber);
+        Page<Product> productsPage = productRepository.findPByBrand(brand, pageable);
+        if (!productsPage.hasContent()) {
+            throw new ObjectNotFoundException("Продуктов с таким брендом не найдено");
+        }
+        return productsPage.map(productMapper::toProductDtoRR);
     }
 
     /**
