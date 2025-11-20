@@ -57,4 +57,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findPByCategory(@NotNull(message = "Категория обязательна") Category category, Pageable pageable);
 
     Page<Product> findPByBrand(@NotNull(message = "Бренд обязан быть") Brand brand, Pageable pageable);
+
+    Page<Product> findPByActive(boolean b, Pageable pageable);
+
+    Page<Product> findAllByAmountGreaterThanAndActive(int i, boolean b, Pageable pageable);
 }

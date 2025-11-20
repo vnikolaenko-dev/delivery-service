@@ -1,5 +1,6 @@
 package ru.don_polesie.back_end.service.staffOnly;
 
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -60,6 +61,16 @@ public class AdminService {
         User user = userRepository.findById(id).orElse(null);
         if (user != null) {
             user.setActive(false);
+            userRepository.save(user);
+            return;
+        }
+        throw new ObjectNotFoundException("User not found");
+    }
+
+    public void activatedUser(@Min(0) Long id) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user != null) {
+            user.setActive(true);
             userRepository.save(user);
             return;
         }
@@ -129,4 +140,5 @@ public class AdminService {
                 .roles(userDtoResponse.getRoles())
                 .build();
     }
+
 }

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,9 +15,7 @@ import ru.don_polesie.back_end.dto.product.ProductDtoFull;
 import ru.don_polesie.back_end.dto.product.request.ProductDtoSearchRequest;
 import ru.don_polesie.back_end.model.product.Brand;
 import ru.don_polesie.back_end.model.product.Category;
-import ru.don_polesie.back_end.service.product.BrandService;
-import ru.don_polesie.back_end.service.product.CategoryService;
-import ru.don_polesie.back_end.service.product.WorkerProductService;
+import ru.don_polesie.back_end.service.product.SearchProductService;
 
 
 @Tag(
@@ -28,10 +27,10 @@ import ru.don_polesie.back_end.service.product.WorkerProductService;
 @RequiredArgsConstructor
 public class ProductSearchController {
 
-    private final WorkerProductService productServiceImpl;
+    private final SearchProductService searchProductService;
 
     @Operation(
-            summary = "Получить товары с пагинацией",
+            summary = "Получить активные товары с пагинацией",
             description = "Возвращает страницу с товарами, отсортированными по идентификатору"
     )
     @ApiResponses({
@@ -41,7 +40,22 @@ public class ProductSearchController {
     public ResponseEntity<Page<ProductDtoFull>> findProductsPage(@RequestParam @Min(value = 0) Integer pageNumber) {
         return ResponseEntity
                 .status(HttpStatus.FOUND)
-                .body(productServiceImpl.findProductsPage(pageNumber));
+                .body(searchProductService.findProductsActivatedPage(pageNumber));
+    }
+
+    @Operation(
+            summary = "Получить неактивные товары с пагинацией",
+            description = "Возвращает страницу с товарами, отсортированными по идентификатору"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Список товаров успешно получен")
+    })
+    @RolesAllowed({"ADMIN", "WORKER"})
+    @GetMapping("/deactivated")
+    public ResponseEntity<Page<ProductDtoFull>> findDeactivatedProductsPage(@RequestParam @Min(value = 0) Integer pageNumber) {
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .body(searchProductService.findProductsDeactivatedPage(pageNumber));
     }
 
     @Operation(
@@ -55,7 +69,7 @@ public class ProductSearchController {
     public ResponseEntity<Page<ProductDtoFull>> findProductsPageWithSale(@RequestParam @Min(value = 0) Integer pageNumber) {
         return ResponseEntity
                 .status(HttpStatus.FOUND)
-                .body(productServiceImpl.findProductsPageWithSale(pageNumber));
+                .body(searchProductService.findProductsPageWithSale(pageNumber));
     }
 
     @Operation(
@@ -70,7 +84,7 @@ public class ProductSearchController {
     public ResponseEntity<ProductDtoFull> findById(@PathVariable @Min(value = 1) Long id) {
         return ResponseEntity
                 .status(HttpStatus.FOUND)
-                .body(productServiceImpl.findById(id));
+                .body(searchProductService.findById(id));
     }
 
     @Operation(
@@ -95,7 +109,7 @@ public class ProductSearchController {
 
         return ResponseEntity
                 .status(HttpStatus.FOUND)
-                .body(productServiceImpl.findAllByParams(productDtoSearch, pageNumber));
+                .body(searchProductService.findAllByParams(productDtoSearch, pageNumber));
     }
 
     @Operation(
@@ -111,7 +125,7 @@ public class ProductSearchController {
                                                                     @RequestParam Integer pageNumber) {
         return ResponseEntity
                 .status(HttpStatus.FOUND)
-                .body(productServiceImpl.findProductByQuery(query, pageNumber));
+                .body(searchProductService.findProductByQuery(query, pageNumber));
     }
 
     @GetMapping("/by-category")
@@ -119,7 +133,7 @@ public class ProductSearchController {
                                                                       @RequestParam Integer pageNumber){
         return ResponseEntity
                 .status(HttpStatus.FOUND)
-                .body(productServiceImpl.findProductsByCategory(pageNumber, new Category(categoryName)));
+                .body(searchProductService.findProductsByCategory(pageNumber, new Category(categoryName)));
     }
 
     @GetMapping("/by-brand")
@@ -127,7 +141,7 @@ public class ProductSearchController {
                                                                       @RequestParam Integer pageNumber){
         return ResponseEntity
                 .status(HttpStatus.FOUND)
-                .body(productServiceImpl.findProductsByBrand(pageNumber, new Brand(brandName)));
+                .body(searchProductService.findProductsByBrand(pageNumber, new Brand(brandName)));
     }
 
 }

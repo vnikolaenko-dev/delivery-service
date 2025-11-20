@@ -73,4 +73,13 @@ public class CategoryService {
         category.get().setActive(false);
         categoryRepository.save(category.get());
     }
+
+    public void activate(@Min(1) Integer id) {
+        Optional<Category> category = categoryRepository.findById(id);
+        if (category.isEmpty()) {
+            throw new ObjectNotFoundException("Категорию невозможно активировать: такой категории не существует");
+        }
+        category.get().setActive(true);
+        categoryRepository.save(category.get());
+    }
 }

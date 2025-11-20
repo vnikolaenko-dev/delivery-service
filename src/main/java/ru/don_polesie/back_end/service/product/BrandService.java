@@ -72,4 +72,13 @@ public class BrandService {
         brand.get().setActive(false);
         brandRepository.save(brand.get());
     }
+
+    public void activate(@Min(1) Integer id) {
+        Optional<Brand> brand = brandRepository.findById(id);
+        if (brand.isEmpty()) {
+            throw new ObjectNotFoundException("Брэнд невозможно активировать: такого брэенда не существует");
+        }
+        brand.get().setActive(true);
+        brandRepository.save(brand.get());
+    }
 }

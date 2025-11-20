@@ -68,4 +68,16 @@ public class BrandController {
         log.info("{} deactivated brand {}", user.toString(), id);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(
+            summary = "Сделать активным бренд"
+    )
+    @PutMapping("/activate")
+    public ResponseEntity<Void> activateBrand(@RequestParam @Min(1) Integer id)  {
+        brandService.activate(id);
+
+        User user = securityUtils.getCurrentUser();
+        log.info("{} activated brand {}", user.toString(), id);
+        return ResponseEntity.ok().build();
+    }
 }

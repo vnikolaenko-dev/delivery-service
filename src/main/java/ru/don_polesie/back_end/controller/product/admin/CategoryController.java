@@ -69,4 +69,16 @@ public class CategoryController {
         log.info("{} deactivated category {}", user.toString(), id);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(
+            summary = "Сделать неактивным категорию"
+    )
+    @PutMapping("/activate")
+    public ResponseEntity<Void> activateBrand(@RequestParam @Min(1) Integer id) {
+        categoryService.activate(id);
+
+        User user = securityUtils.getCurrentUser();
+        log.info("{} activated category {}", user.toString(), id);
+        return ResponseEntity.ok().build();
+    }
 }

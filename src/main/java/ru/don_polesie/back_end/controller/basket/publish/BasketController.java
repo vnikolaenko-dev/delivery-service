@@ -12,8 +12,9 @@ import ru.don_polesie.back_end.mapper.BasketMapper;
 import ru.don_polesie.back_end.mapper.ProductMapper;
 import ru.don_polesie.back_end.security.SecurityUtils;
 import ru.don_polesie.back_end.service.basket.BasketService;
+import ru.don_polesie.back_end.service.product.ManageProductService;
+import ru.don_polesie.back_end.service.product.SearchProductService;
 import ru.don_polesie.back_end.service.system.PriceService;
-import ru.don_polesie.back_end.service.product.WorkerProductService;
 
 import java.math.BigDecimal;
 
@@ -24,7 +25,8 @@ public class BasketController {
     private final BasketService basketService;
     private final SecurityUtils securityUtils;
     private final BasketMapper basketMapper;
-    private final WorkerProductService workerProductService;
+    private final SearchProductService searchProductService;
+    private final ManageProductService manageProductService;
     private final PriceService priceService;
     private final ProductMapper productMapper;
 
@@ -36,7 +38,7 @@ public class BasketController {
         dto.setTotalPrice(BigDecimal.ZERO);
         dto.getItems().forEach(
                 orderItemDto -> {
-                    var productRR = workerProductService.findById(orderItemDto.getProductId());
+                    var productRR = searchProductService.findById(orderItemDto.getProductId());
                     var product = productMapper.productDtoRRtoProduct(productRR);
                     orderItemDto.setPrice(product.getPrice());
                     orderItemDto.setProductName(product.getName());

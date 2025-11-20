@@ -96,5 +96,20 @@ public class AdminUserManageController {
                 .status(HttpStatus.NO_CONTENT)
                 .build();
     }
+
+    @Operation(
+            summary = "Активировать пользователя",
+            description = "Активирует пользователя в системе по его идентификатору"
+    )
+    @DeleteMapping("/user/activate/{id}")
+    public ResponseEntity<Void> activatedUser(@PathVariable @Min(0) Long id) {
+        adminService.activatedUser(id);
+
+        var user = securityUtils.getCurrentUser();
+        log.info("User {} activated user {}", user.getPhoneNumber(), id);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
+    }
 }
 
