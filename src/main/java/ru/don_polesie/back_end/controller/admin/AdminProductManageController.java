@@ -32,7 +32,7 @@ public class AdminProductManageController {
     public ResponseEntity<ProductDtoFull> save(@RequestBody @Valid ProductDtoFull productDtoFull) {
         ProductDtoFull newProductDtoFull = productServiceImpl.save(productDtoFull);
         var user = securityUtils.getCurrentUser();
-        log("User " + user.getPhoneNumber() + " created product " + productDtoFull.toString());
+        log.info("User {} created product {}", user.getPhoneNumber(), productDtoFull.toString());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(newProductDtoFull);
@@ -47,7 +47,7 @@ public class AdminProductManageController {
                                        @PathVariable @Min(value = 1) Long id) {
         productServiceImpl.update(productDtoFull, id);
         var user = securityUtils.getCurrentUser();
-        log("User " + user.getPhoneNumber() + " edit product " + productDtoFull.toString());
+        log.info("User {} edit product {}", user.getPhoneNumber(), productDtoFull.toString());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .build();
@@ -63,7 +63,7 @@ public class AdminProductManageController {
             @RequestParam @Min(value = 0) @Max(value = 100) Integer sale) {
         productServiceImpl.editSale(id, sale);
         var user = securityUtils.getCurrentUser();
-        log("User " + user.getPhoneNumber() + " edit sale for product " + id + " - " + sale + "%");
+        log.info("User {} edit sale for product {} - {}%", user.getPhoneNumber(), id, sale);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .build();
@@ -75,9 +75,9 @@ public class AdminProductManageController {
     )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable @Min(value = 1) Long id) {
-        productServiceImpl.deleteById(id);
+        productServiceImpl.deactivateById(id);
         var user = securityUtils.getCurrentUser();
-        log("User " + user.getPhoneNumber() + " deactivated Address " + id);
+        log.info("User {} deactivated Product {}", user.getPhoneNumber(), id);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();

@@ -15,7 +15,6 @@ import ru.don_polesie.back_end.service.userOnly.UserAddressService;
 
 import java.util.List;
 
-import static java.rmi.server.LogStream.log;
 
 @RestController
 @RequiredArgsConstructor
@@ -48,7 +47,7 @@ public class AddressController {
     @PostMapping()
     public ResponseEntity<String> createUserAddress(@RequestBody AddressDtoRequest address) {
         var user = securityUtils.getCurrentUser();
-        log("User " + user.getPhoneNumber() + " created Address " + address.toString());
+        log.info("User {} created Address {}", user.getPhoneNumber(), address.toString());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(userAddressService.save(address, user));
@@ -62,7 +61,7 @@ public class AddressController {
     public ResponseEntity<Void> deleteUserAddress(@PathVariable @Min(0) Long id) {
         var user = securityUtils.getCurrentUser();
         userAddressService.delete(id, user);
-        log("User " + user.getPhoneNumber() + " deactivated Address " + id);
+        log.info("User {} deactivated Address {}", user.getPhoneNumber(), id);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();

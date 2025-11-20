@@ -25,6 +25,19 @@ public class OrderProcessController {
     private final SecurityUtils securityUtils;
 
     @Operation(
+            summary = "Забрать на сборку заказ",
+            description = "Сотрудник начинает сборку заказа"
+    )
+    @PostMapping("/{id}/assembly")
+    public ResponseEntity<Void> assembly(@PathVariable @Min(value = 1) Long id) {
+        User user = securityUtils.getCurrentUser();
+        workOrderService.takeOrder(id, user);
+
+        log.info("{} took order {}", user.getPhoneNumber(), id);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
             summary = "Обработать заказ",
             description = "Обновление весов и статуса заказа в процессе сборки"
     )

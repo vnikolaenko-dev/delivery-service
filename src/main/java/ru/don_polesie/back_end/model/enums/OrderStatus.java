@@ -7,6 +7,7 @@ public enum OrderStatus {
     NEW("Новый заказ"),
     PAYING("Ожидает оплаты"),
     MONEY_RESERVAITED("Деньги зарезервированы на сайте партнера, собираем заказ"),
+    ON_ASSEMBLY("Заказ собирается"),
     PAID("Заказ оплачен"),
     READY_FOR_DELIVERY("Заказ готов к доставке"),
     SHIPPED("Доставлен"),

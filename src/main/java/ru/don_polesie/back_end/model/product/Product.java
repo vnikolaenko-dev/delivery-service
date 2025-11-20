@@ -128,6 +128,9 @@ public class Product {
     @Max(100)
     private Integer sale = 0;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
     private Instant createdAt;

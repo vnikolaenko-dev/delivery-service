@@ -69,6 +69,11 @@ public class Order {
     @Column(unique = true)
     private String paymentId;
 
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_id") // Указано имя колонки
+    private User employee;
+
     public Order() {}
 
     public void addProduct(OrderProduct op) {

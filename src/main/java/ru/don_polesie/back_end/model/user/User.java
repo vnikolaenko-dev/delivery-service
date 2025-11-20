@@ -112,4 +112,7 @@ public class User {
     @UpdateTimestamp
     @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
+
+    @Column(nullable = false)
+    private boolean active = true;
 }

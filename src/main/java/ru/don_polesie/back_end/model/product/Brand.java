@@ -29,6 +29,9 @@ public class Brand {
             message = "Название категории может содержать только буквы, цифры, пробелы и символы - . &")
     private String name;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
     public Brand(String name) {
         this.name = name;
     }

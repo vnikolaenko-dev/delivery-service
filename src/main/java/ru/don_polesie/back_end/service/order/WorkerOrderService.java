@@ -1,5 +1,6 @@
 package ru.don_polesie.back_end.service.order;
 
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,11 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.don_polesie.back_end.dto.order.response.OrderDtoResponse;
 import ru.don_polesie.back_end.dto.order.request.ProcessQuantitiesDtoRequest;
+import ru.don_polesie.back_end.exceptions.ConflictDataException;
 import ru.don_polesie.back_end.model.enums.OrderStatus;
 import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.mapper.OrderMapper;
 import ru.don_polesie.back_end.model.order.Order;
 import ru.don_polesie.back_end.model.order.OrderProduct;
+import ru.don_polesie.back_end.model.user.User;
 import ru.don_polesie.back_end.repository.OrderProductRepository;
 import ru.don_polesie.back_end.repository.OrderRepository;
 
@@ -24,6 +27,7 @@ import ru.don_polesie.back_end.service.system.YooKassaService;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -101,13 +105,28 @@ public class WorkerOrderService {
     @Transactional
     public void processOrder(Long id, ProcessQuantitiesDtoRequest request) throws BadRequestException {
         Order order = getOrderById(id);
-        if (!OrderStatus.MONEY_RESERVAITED.equals(order.getStatus())) {
-            throw new IllegalArgumentException("Деньги не зарезервированы, заказ нельзя обработать");
+        if (!OrderStatus.ON_ASSEMBLY.equals(order.getStatus())) {
+            throw new IllegalArgumentException("Заказ не собирался, заказ нельзя обработать");
         }
         Map<Long, ProcessQuantitiesDtoRequest.QuantityDto> quantitesMap = createQuantitesMap(request);
         BigDecimal newTotal = processOrderProducts(order, quantitesMap);
         updateOrderPayment(order, newTotal);
 
+        orderRepository.save(order);
+    }
+
+    public void takeOrder(@Min(value = 1) Long id, User user) {
+        Optional<Order> orderOptional = orderRepository.findOrderByStatusAndEmployee(OrderStatus.ON_ASSEMBLY, user);
+        if (orderOptional.isPresent()) {
+            throw new ConflictDataException("У сотрудника уже есть заказ, который ждет обработки");
+        }
+
+        Order order = getOrderById(id);
+        if (!OrderStatus.MONEY_RESERVAITED.equals(order.getStatus())) {
+            throw new IllegalArgumentException("Деньги не зарезервированы, заказ нельзя забрать для сборки");
+        }
+        order.setEmployee(user);
+        order.setStatus(OrderStatus.ON_ASSEMBLY);
         orderRepository.save(order);
     }
 
@@ -155,6 +174,14 @@ public class WorkerOrderService {
         var pageable = PageRequest.of(pageNumber, PAGE_SIZE, Sort.by("id").descending());
         return orderRepository.findAllByStatus(orderStatus, pageable)
                 .map(orderMapper::toOrderDtoResponse);
+    }
+
+    public OrderDtoResponse findAssemblyOrderForEmployee(User user) {
+        Optional<Order> order = orderRepository.findOrderByStatusAndEmployee(OrderStatus.ON_ASSEMBLY, user);
+        if (order.isEmpty()) {
+            throw new ObjectNotFoundException("Нет заказов на этапе сборки для сотрудника");
+        }
+        return orderMapper.toOrderDtoResponse(order.get());
     }
 
     // ========== ПРИВАТНЫЕ ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========

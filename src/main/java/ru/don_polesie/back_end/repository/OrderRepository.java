@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.don_polesie.back_end.model.enums.OrderStatus;
 import ru.don_polesie.back_end.model.order.Order;
+import ru.don_polesie.back_end.model.user.User;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -47,6 +48,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByStatusAndPaymentIdIsNotNull(OrderStatus status);
 
     Page<Order> findAllByStatus(OrderStatus status, Pageable pageable);
+
+    Optional<Order> findOrderByStatusAndEmployee(OrderStatus status, User employee);
 
     // Можно обернуть в удобный метод для "PAID"
     default Page<Order> findAllPaid(Pageable pageable) {

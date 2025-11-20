@@ -37,7 +37,11 @@ public class UserAuthService {
     /**
      * Отправка временного пароля
      */
-    public void sendTemporaryPassword(String number) throws BadAttributeValueExpException {
+    public void sendTemporaryPassword(String number) {
+        if (!userRepository.existsByPhoneNumberAndActiveTrue(number)) {
+            throw new RequestValidationException("Вы были заблокированы, обратитесь в службу поддержки для решения вопроса");
+        }
+
         if (!PhoneNumberValidator.isValidRussianPhone(number)) {
             throw new RequestValidationException("Некорректный номер телефона");
         }

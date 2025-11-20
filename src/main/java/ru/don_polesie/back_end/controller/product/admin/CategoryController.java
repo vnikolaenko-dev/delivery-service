@@ -50,11 +50,23 @@ public class CategoryController {
             summary = "Удалить категорию"
     )
     @DeleteMapping
-    public ResponseEntity<Void> removeCategory(@RequestParam @Min(1) Integer id) throws BadAttributeValueExpException {
+    public ResponseEntity<Void> removeCategory(@RequestParam @Min(1) Integer id)  {
         categoryService.remove(id);
 
         User user = securityUtils.getCurrentUser();
         log.info("{} removed category {}", user.toString(), id);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Сделать неактивным категорию"
+    )
+    @PutMapping("/deactivate")
+    public ResponseEntity<Void> deactivateBrand(@RequestParam @Min(1) Integer id) {
+        categoryService.deactivate(id);
+
+        User user = securityUtils.getCurrentUser();
+        log.info("{} deactivated category {}", user.toString(), id);
         return ResponseEntity.ok().build();
     }
 }

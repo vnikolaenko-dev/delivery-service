@@ -9,6 +9,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.don_polesie.back_end.dto.product.ProductDtoFull;
+import ru.don_polesie.back_end.exceptions.ConflictDataException;
+import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
+import ru.don_polesie.back_end.model.product.Brand;
 import ru.don_polesie.back_end.model.product.Category;
 import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.CategoryRepository;
@@ -32,7 +35,7 @@ public class CategoryService {
     }
 
     public List<Category> findAll() {
-        return categoryRepository.findAll();
+        return categoryRepository.findByActiveTrue();
     }
 
     public Category findByName(String name) {
@@ -42,23 +45,32 @@ public class CategoryService {
     public void update(@Min(1) Integer id, String name) throws BadAttributeValueExpException {
         Optional<Category> category = categoryRepository.findById(id);
         if (category.isEmpty()) {
-            throw new BadAttributeValueExpException("Категорию невозможно удалить: такой категории не существует");
+            throw new ObjectNotFoundException("Категорию невозможно удалить: такой категории не существует");
         }
         category.get().setName(name);
         categoryRepository.save(category.get());
     }
 
 
-    public void remove(@Min(1) Integer id) throws BadAttributeValueExpException {
+    public void remove(@Min(1) Integer id) {
         Optional<Category> category = categoryRepository.findById(id);
         if (category.isEmpty()) {
-            throw new BadAttributeValueExpException("Категорию невозможно удалить: такой категории не существует");
+            throw new ObjectNotFoundException("Категорию невозможно удалить: такой категории не существует");
         }
         Page<Product> page = productRepository.findPByCategory(category.get(), PageRequest.of(0, 1, Sort.by("id").descending()));
         if (!page.isEmpty()) {
-            throw new BadAttributeValueExpException("Категорию невозможно удалить: существуют товары с такой категорией.");
+            throw new ConflictDataException("Категорию невозможно удалить: существуют товары с такой категорией.");
         }
 
         categoryRepository.deleteById(id);
+    }
+
+    public void deactivate(@Min(1) Integer id) {
+        Optional<Category> category = categoryRepository.findById(id);
+        if (category.isEmpty()) {
+            throw new ObjectNotFoundException("Категорию невозможно деактивировать: такой категории не существует");
+        }
+        category.get().setActive(false);
+        categoryRepository.save(category.get());
     }
 }

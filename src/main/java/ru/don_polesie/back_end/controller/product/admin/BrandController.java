@@ -37,7 +37,7 @@ public class BrandController {
             summary = "Обновить брэнд"
     )
     @PutMapping
-    public ResponseEntity<Void> updateCategory(@RequestParam @Min(1) Integer id, @RequestParam String name) throws BadAttributeValueExpException {
+    public ResponseEntity<Void> updateBrand(@RequestParam @Min(1) Integer id, @RequestParam String name) throws BadAttributeValueExpException {
         brandService.update(id, name);
 
         User user = securityUtils.getCurrentUser();
@@ -49,11 +49,23 @@ public class BrandController {
             summary = "Удалить бренд"
     )
     @DeleteMapping
-    public ResponseEntity<Void> removeCategory(@RequestParam @Min(1) Integer id) throws BadAttributeValueExpException {
+    public ResponseEntity<Void> removeBrand(@RequestParam @Min(1) Integer id) {
         brandService.remove(id);
 
         User user = securityUtils.getCurrentUser();
         log.info("{} removed brand {}", user.toString(), id);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Сделать неактивным бренд"
+    )
+    @PutMapping("/deactivate")
+    public ResponseEntity<Void> deactivateBrand(@RequestParam @Min(1) Integer id)  {
+        brandService.deactivate(id);
+
+        User user = securityUtils.getCurrentUser();
+        log.info("{} deactivated brand {}", user.toString(), id);
         return ResponseEntity.ok().build();
     }
 }

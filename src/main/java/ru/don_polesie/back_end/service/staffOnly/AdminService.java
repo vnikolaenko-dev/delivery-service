@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.don_polesie.back_end.dto.user.UserDto;
+import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.model.user.User;
 import ru.don_polesie.back_end.repository.UserRepository;
 
@@ -55,8 +56,14 @@ public class AdminService {
      * @param id идентификатор пользователя
      */
 
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id.longValue());
+    public void deactivatedUser(Long id) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user != null) {
+            user.setActive(false);
+            userRepository.save(user);
+            return;
+        }
+        throw new ObjectNotFoundException("User not found");
     }
 
     /**

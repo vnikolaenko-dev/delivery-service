@@ -21,6 +21,7 @@ import ru.don_polesie.back_end.model.product.Product;
 import ru.don_polesie.back_end.repository.ProductRepository;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -135,7 +136,6 @@ public class WorkerProductService {
         Product newProduct = productMapper.productDtoRRtoProduct(productDtoFull);
         checkBrandAndCategory(newProduct);
         Product savedProduct = productRepository.save(newProduct);
-        log.info("Saved product: {}", savedProduct);
         return productMapper.toProductDtoRR(savedProduct);
     }
 
@@ -143,7 +143,6 @@ public class WorkerProductService {
     public void editSale(@Min(value = 1) Long id, @Min(value = 1) @Max(value = 100) Integer sale) {
         Product existingProduct = getProductById(id);
         existingProduct.setSale(sale);
-        log.info("Edited sale for product with id: {} sale:{}", existingProduct.getId(), existingProduct.getSale());
         productRepository.save(existingProduct);
     }
 
@@ -162,7 +161,6 @@ public class WorkerProductService {
         checkBrandAndCategory(existingProduct);
         updateProductFromDto(existingProduct, productDtoFull);
         Product savedProduct = productRepository.save(existingProduct);
-        log.info("Updated product: {}", savedProduct);
         return productMapper.toProductDtoRR(savedProduct);
     }
 
@@ -179,7 +177,15 @@ public class WorkerProductService {
             throw new ObjectNotFoundException("Product not found with id: " + id);
         }
         productRepository.deleteById(id);
-        log.info("Deleted product with id: {}", id);
+    }
+
+    public void deactivateById(@Min(value = 1) Long id) {
+        Optional<Product> productOptional = productRepository.findById(id);
+        if (productOptional.isEmpty()) {
+            throw new ObjectNotFoundException("Product not found with id: " + id);
+        }
+        productOptional.get().setActive(false);
+        productRepository.save(productOptional.get());
     }
 
 
@@ -240,5 +246,4 @@ public class WorkerProductService {
         product.setStorageTemperatureMax(productDtoFull.getStorageTemperatureMax());
         product.setCountryOfOrigin(productDtoFull.getCountryOfOrigin());
     }
-
 }

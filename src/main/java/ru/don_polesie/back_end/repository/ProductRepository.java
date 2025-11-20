@@ -15,10 +15,13 @@ import ru.don_polesie.back_end.model.product.Category;
 import ru.don_polesie.back_end.model.product.Product;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
+
+    List<Product> findByActiveTrue();
 
     @NonNull
     Optional<Product> findById(@NonNull Long id);
@@ -28,9 +31,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findAllByAmountGreaterThan(int amount, Pageable pageable);
 
     Page<Product> findAllBySaleGreaterThan(int i, Pageable pageable);
-
-    Optional<ArrayList<Product>> findByBrand(Brand brand);
-
 
     @Query("SELECT p FROM Product p " +
             "WHERE (:brand IS NULL OR (LOWER(p.brand) LIKE CONCAT('%', LOWER(CAST(:brand AS string)), '%')))" +

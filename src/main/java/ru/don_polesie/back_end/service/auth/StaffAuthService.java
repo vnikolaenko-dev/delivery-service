@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.don_polesie.back_end.dto.auth.request.JwtAuthRequest;
 import ru.don_polesie.back_end.dto.auth.response.JwtAuthResponse;
+import ru.don_polesie.back_end.exceptions.RequestValidationException;
+import ru.don_polesie.back_end.repository.UserRepository;
 import ru.don_polesie.back_end.security.admin.JwtTokenProvider;
 
 
@@ -13,6 +15,7 @@ import ru.don_polesie.back_end.security.admin.JwtTokenProvider;
 @Transactional(readOnly = true)
 public class StaffAuthService {
 
+    private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final JWTGeneratorService jwtGeneratorService;
 
@@ -24,6 +27,9 @@ public class StaffAuthService {
      */
 
     public JwtAuthResponse login(JwtAuthRequest loginRequest) {
+        if (!userRepository.existsByPhoneNumberAndActiveTrue(loginRequest.getPhoneNumber())) {
+            throw new RequestValidationException("Вы были заблокированы, обратитесь в службу поддержки для решения вопроса");
+        }
         return jwtGeneratorService.generateJWT(loginRequest.getPhoneNumber(), loginRequest.getPassword());
     }
 

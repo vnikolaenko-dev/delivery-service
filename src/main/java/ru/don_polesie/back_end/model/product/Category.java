@@ -33,6 +33,9 @@ public class Category {
             message = "Название категории может содержать только буквы, цифры, пробелы и символы - . &")
     private String name;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
     public Category(String name) {
         this.name = name;
     }

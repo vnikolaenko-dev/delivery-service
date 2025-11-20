@@ -8,6 +8,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.don_polesie.back_end.dto.product.ProductDtoFull;
+import ru.don_polesie.back_end.exceptions.ConflictDataException;
+import ru.don_polesie.back_end.exceptions.ObjectNotFoundException;
 import ru.don_polesie.back_end.model.product.Brand;
 import ru.don_polesie.back_end.model.product.Category;
 import ru.don_polesie.back_end.model.product.Product;
@@ -33,33 +35,41 @@ public class BrandService {
     }
 
     public List<Brand> findAll() {
-        return brandRepository.findAll();
+        return brandRepository.findByActiveTrue();
     }
 
     public Brand findByName(String name) {
         return brandRepository.findByName(name).orElse(null);
     }
 
-    public void update(@Min(1) Integer id, String name) throws BadAttributeValueExpException {
+    public void update(@Min(1) Integer id, String name) {
         Optional<Brand> brand = brandRepository.findById(id);
         if (brand.isEmpty()) {
-            throw new BadAttributeValueExpException("Категорию невозможно удалить: такой категории не существует");
+            throw new ObjectNotFoundException("Брэнд невозможно удалить: такой категории не существует");
         }
         brand.get().setName(name);
         brandRepository.save(brand.get());
     }
 
 
-    public void remove(@Min(1) Integer id) throws BadAttributeValueExpException {
+    public void remove(@Min(1) Integer id) {
         Optional<Brand> brand = brandRepository.findById(id);
         if (brand.isEmpty()) {
-            throw new BadAttributeValueExpException("Категорию невозможно удалить: такой категории не существует");
+            throw new ObjectNotFoundException("Брэнд невозможно удалить: такого брэенда не существует");
         }
         Page<Product> page = productRepository.findPByBrand(brand.get(),  PageRequest.of(0, 1, Sort.by("id").descending()));
         if (!page.isEmpty()) {
-            throw new BadAttributeValueExpException("Категорию невозможно удалить: существуют товары с такой категорией.");
+            throw new ConflictDataException("Бренд невозможно удалить: существуют товары с таким брэендом.");
         }
-
         brandRepository.deleteById(id);
+    }
+
+    public void deactivate(@Min(1) Integer id) {
+        Optional<Brand> brand = brandRepository.findById(id);
+        if (brand.isEmpty()) {
+            throw new ObjectNotFoundException("Брэнд невозможно деактивировать: такого брэенда не существует");
+        }
+        brand.get().setActive(false);
+        brandRepository.save(brand.get());
     }
 }

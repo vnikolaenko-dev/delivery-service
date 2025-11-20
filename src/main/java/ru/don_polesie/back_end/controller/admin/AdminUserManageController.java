@@ -86,9 +86,9 @@ public class AdminUserManageController {
             summary = "Деактивировать пользователя",
             description = "Деактивирует пользователя в системе по его идентификатору"
     )
-    @DeleteMapping("/user/delete/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable @Min(0) Long id) {
-        adminService.deleteUser(id);
+    @DeleteMapping("/user/deactivate/{id}")
+    public ResponseEntity<Void> deactivatedUser(@PathVariable @Min(0) Long id) {
+        adminService.deactivatedUser(id);
 
         var user = securityUtils.getCurrentUser();
         log.info("User {} deactivated user {}", user.getPhoneNumber(), id);

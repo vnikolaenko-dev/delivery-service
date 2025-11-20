@@ -25,7 +25,7 @@ public class UserAddressService {
      */
 
     public List<AddressDtoResponse> getUserAddresses(User user) {
-        return addressRepository.findAllByUser(user)
+        return addressRepository.findByUserAndActiveTrue(user)
                 .stream()
                 .map(addressMapper::toDto)
                 .toList();

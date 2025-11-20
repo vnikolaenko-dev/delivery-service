@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.don_polesie.back_end.dto.order.response.OrderDtoResponse;
 import ru.don_polesie.back_end.model.enums.OrderStatus;
+import ru.don_polesie.back_end.model.user.User;
+import ru.don_polesie.back_end.security.SecurityUtils;
 import ru.don_polesie.back_end.service.order.WorkerOrderService;
 
 @RestController
@@ -16,6 +18,7 @@ import ru.don_polesie.back_end.service.order.WorkerOrderService;
 @RequestMapping("/api/staff/order")
 public class OrderInfoController {
     private final WorkerOrderService workOrderService;
+    private final SecurityUtils securityUtils;
 
     @Operation(
             summary = "Заказ по id",
@@ -26,6 +29,18 @@ public class OrderInfoController {
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(workOrderService.findById(id));
+    }
+
+    @Operation(
+            summary = "Заказ сотрудника для сборки",
+            description = "Возвращает заказ по id"
+    )
+    @GetMapping("/assembly")
+    public ResponseEntity<OrderDtoResponse> assembly() {
+        User user = securityUtils.getCurrentUser();
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .body(workOrderService.findAssemblyOrderForEmployee(user));
     }
 
     @Operation(
