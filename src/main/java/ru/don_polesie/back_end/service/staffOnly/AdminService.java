@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.don_polesie.back_end.dto.user.UserDtoResponse;
+import ru.don_polesie.back_end.dto.user.UserDto;
 import ru.don_polesie.back_end.model.user.User;
 import ru.don_polesie.back_end.repository.UserRepository;
 
@@ -30,7 +30,7 @@ public class AdminService {
      * @return страница с пользователями в формате DTO
      */
 
-    public Page<UserDtoResponse> findUsersPage(Integer pageNumber) {
+    public Page<UserDto> findUsersPage(Integer pageNumber) {
         Pageable pageable = createDefaultPageable(pageNumber);
         Page<User> usersPage = userRepository.findByRolesName(USER_ROLE_NAME, pageable);
         return usersPage.map(this::toDTO);
@@ -43,7 +43,7 @@ public class AdminService {
      * @return страница с работниками в формате DTO
      */
 
-    public Page<UserDtoResponse> findWorkersPage(Integer pageNumber) {
+    public Page<UserDto> findWorkersPage(Integer pageNumber) {
         Pageable pageable = createDefaultPageable(pageNumber);
         Page<User> workersPage = userRepository.findByRolesName(WORKER_ROLE_NAME, pageable);
         return workersPage.map(this::toDTO);
@@ -65,12 +65,12 @@ public class AdminService {
      * @param userDtoResponse данные пользователя для создания
      */
 
-    public void createUser(UserDtoResponse userDtoResponse) {
+    public void createUser(UserDto userDtoResponse) {
         User user = createUserFromDTO(userDtoResponse);
         userRepository.save(user);
     }
 
-    public void updateUser(UserDtoResponse userDtoResponse) {
+    public void updateUser(UserDto userDtoResponse) {
         User user = createUserFromDTO(userDtoResponse);
         userRepository.save(user);
     }
@@ -94,8 +94,8 @@ public class AdminService {
      * @param user сущность пользователя
      * @return DTO пользователя
      */
-    private UserDtoResponse toDTO(User user) {
-        UserDtoResponse dto = new UserDtoResponse();
+    private UserDto toDTO(User user) {
+        UserDto dto = new UserDto();
         dto.id = user.getId().intValue();
         dto.name = user.getName();
         dto.surname = user.getSurname();
@@ -111,7 +111,7 @@ public class AdminService {
      * @param userDtoResponse DTO с данными пользователя
      * @return сущность User с зашифрованным паролем
      */
-    private User createUserFromDTO(UserDtoResponse userDtoResponse) {
+    private User createUserFromDTO(UserDto userDtoResponse) {
         String password = userDtoResponse.getPassword();
         return User.builder()
                 .name(userDtoResponse.getName())

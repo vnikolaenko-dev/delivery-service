@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class OrderCreatedDtoResponse {
     private OrderDtoResponse order;
     private JsonNode payment;

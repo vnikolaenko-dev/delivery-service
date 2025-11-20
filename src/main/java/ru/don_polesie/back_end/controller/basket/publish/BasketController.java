@@ -78,7 +78,7 @@ public class BasketController {
     }
 
     @Operation(
-            summary = "Удалить товар из заказа",
+            summary = "Удалить товар из корзины",
             description = "Удаляет конкретный товар из заказа (до момента его обработки)"
     )
     @ApiResponses({

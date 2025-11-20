@@ -2,6 +2,7 @@ package ru.don_polesie.back_end.controller.auth.publish;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import javax.management.BadAttributeValueExpException;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/auth/user")
+@Log4j2
 public class UserAuthControllerImpl {
     private final UserAuthService userAuthService;
 
@@ -38,6 +40,7 @@ public class UserAuthControllerImpl {
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> checkPassword(@RequestParam String phoneNumber, @RequestParam String password) throws BadAttributeValueExpException {
         JwtAuthResponse jwtAuthResponse = userAuthService.checkTemporaryPassword(phoneNumber, password);
+        log.info("{} enter to system ", phoneNumber);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(jwtAuthResponse);

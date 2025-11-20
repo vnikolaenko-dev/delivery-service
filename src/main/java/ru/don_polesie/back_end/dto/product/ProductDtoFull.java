@@ -2,8 +2,10 @@ package ru.don_polesie.back_end.dto.product;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
+@ToString
 public class ProductDtoFull {
 
     private Long id;

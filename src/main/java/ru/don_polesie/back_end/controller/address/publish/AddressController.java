@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,8 @@ import ru.don_polesie.back_end.service.userOnly.UserAddressService;
 
 import java.util.List;
 
+import static java.rmi.server.LogStream.log;
+
 @RestController
 @RequiredArgsConstructor
 @Tag(
@@ -21,6 +24,7 @@ import java.util.List;
         description = "API для управления адресами доставки пользователя"
 )
 @RequestMapping("/api/address")
+@Log4j2
 public class AddressController {
     private final UserAddressService userAddressService;
     private final SecurityUtils securityUtils;
@@ -43,21 +47,22 @@ public class AddressController {
     )
     @PostMapping()
     public ResponseEntity<String> createUserAddress(@RequestBody AddressDtoRequest address) {
-        System.out.println(address);
         var user = securityUtils.getCurrentUser();
+        log("User " + user.getPhoneNumber() + " created Address " + address.toString());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(userAddressService.save(address, user));
     }
 
     @Operation(
-            summary = "Удалить адрес доставки",
-            description = "Удаляет адрес доставки по идентификатору"
+            summary = "Делает адрес доставки неактивным",
+            description = "Адрес доставки по идентификатору больше не будет виден пользователю"
     )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUserAddress(@PathVariable @Min(0) Long id) {
         var user = securityUtils.getCurrentUser();
         userAddressService.delete(id, user);
+        log("User " + user.getPhoneNumber() + " deactivated Address " + id);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();

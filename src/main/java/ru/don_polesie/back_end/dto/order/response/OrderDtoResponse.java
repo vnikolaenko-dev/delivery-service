@@ -3,6 +3,7 @@ package ru.don_polesie.back_end.dto.order.response;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import ru.don_polesie.back_end.dto.address.response.AddressDtoResponse;
 import ru.don_polesie.back_end.model.enums.OrderStatus;
 
@@ -25,10 +26,29 @@ public class OrderDtoResponse {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    @ToString
     public static class OrderItemDto {
         private Long productId;
         private String productName;
         private Integer quantity;
         private BigDecimal price;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (OrderItemDto item : items) {
+            sb.append(item.toString());
+            sb.append("\n");
+        }
+        return "OrderDtoResponse{" +
+                "id=" + id +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", address=" + address +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", status=" + status +
+                ", items: " + sb +
+                '}';
     }
 }
